@@ -27,6 +27,11 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
         for role in roles:
             await discord_member.add_roles(role)
 
+    if role_rank >= 1:
+        return list(hierarchy.keys())[list(hierarchy.values()).index(role_rank)]
+    else:
+        return None
+
 
 async def _add_minimum_guild_rank(server: Guild, discord_member: Member):
     await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
@@ -136,12 +141,12 @@ class MemberRoleManager(commands.Cog):
             await inter.followup.send(BOT_MESSAGES['NOT_GUILD_MEMBER'])
             return
         else:
-            await _add_roles_by_guild_rank(server, member, guild_member.get('rank').upper())
+            highest_given_role = await _add_roles_by_guild_rank(server, member, guild_member.get('rank').upper())
             user_name_set = await _set_nick_name(member, user_name)
 
         upsert_user(inter.user.id, user_name, api_key)
 
-        response = BOT_MESSAGES['IS_GUILD_MEMBER'].format(user_name=user_name, role_name=guild_member.get('rank'))
+        response = BOT_MESSAGES['IS_GUILD_MEMBER'].format(user_name=user_name, role_name=highest_given_role)
         if user_name_set:
             response += ' ' + BOT_MESSAGES['USER_NAME_SET']
         await send_log(server, f"<@{inter.user.id}> linked to {user_name}")
