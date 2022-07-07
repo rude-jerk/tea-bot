@@ -11,7 +11,7 @@ class RosterReports(commands.Cog):
         self.bot = bot
 
     @commands.slash_command(name='gw2roster', description='Returns the full roster of in game TEA members',
-                            default_member_permissions=Permissions(moderate_members=True))
+                            default_member_permissions=Permissions(moderate_members=True), dm_permission=False)
     async def generate_in_game_roster(self, inter: Inter):
         await inter.response.defer(ephemeral=True, with_message=True)
 
