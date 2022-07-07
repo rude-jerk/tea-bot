@@ -1,3 +1,6 @@
 .idea
 configs/bot.yaml
 guild_members.db
+venv
+.env
+*.pyc
