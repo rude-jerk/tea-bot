@@ -43,7 +43,7 @@ async def _set_nick_name(member: Member, user_name: str):
         current_nick = member.nick
         new_nick = None
         if current_nick:
-            if user_name not in current_nick:
+            if user_name.lower() not in current_nick.lower():
                 new_nick = f"{current_nick} ({user_name})"
         else:
             new_nick = f"{member.name} ({user_name})"
