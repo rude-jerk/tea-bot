@@ -8,15 +8,15 @@ def _build_headers(key):
     return {'Authorization': f'Bearer {key}'}
 
 
-@cached(TTLCache(maxsize=1, ttl=120))
-def _get_members():
+@cached(TTLCache(maxsize=1, ttl=240))
+def get_guild_members():
     r = requests.get(API_ENDPOINTS['GW2_GUILD_MEMBERS'].format(guild_id=GUILD['GW2_GUILD_ID']),
                      headers=_build_headers(BOT_CONFIG['LEADER_KEY']))
     return r.json()
 
 
 def get_guild_member(user_name: str):
-    for member in _get_members():
+    for member in get_guild_members():
         if member.get('name') is not None and str(member.get('name')).lower() == user_name.lower():
             return member
     return False

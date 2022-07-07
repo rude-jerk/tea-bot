@@ -44,3 +44,8 @@ def upsert_user(discord_id, account_id, api_key):
         member.gw2_account_id = account_id
         db_session.add(member)
     db_session.commit()
+
+
+def get_all_db_users():
+    members = db_session.query(GuildMember).all()
+    return [row.__dict__ for row in members]
