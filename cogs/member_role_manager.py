@@ -1,4 +1,4 @@
-from disnake import Client, Member, ApplicationCommandInteraction as Inter, Guild, Message
+from disnake import Client, Member, ApplicationCommandInteraction as Inter, Guild, Message, Permissions, User
 from disnake.errors import Forbidden
 from disnake.ext import commands
 
@@ -167,6 +167,40 @@ class MemberRoleManager(commands.Cog):
         else:
             response += ' ' + BOT_MESSAGES['USER_NAME_UNSET']
         await send_log(server, f"<@{inter.user.id}> linked to {user_name} with an API key")
+        await inter.followup.send(response)
+
+    @commands.slash_command(name='tlink', description='Links a given user to a GW2 account',
+                            default_member_permissions=Permissions(moderate_members=True), dm_permission=False)
+    async def admin_link(self, inter: Inter, member: Member, gw2_account: str):
+        await inter.response.defer(ephemeral=True, with_message=True)
+        server = self.bot.get_guild(BOT_CONFIG['SERVER'])
+
+        role_name = 'Freshman'
+        if not valid_gw2_user(gw2_account):
+            await inter.followup.send(BOT_MESSAGES['BAD_USER'])
+            return
+
+        stored_user = get_user_by_gw2_account_id(gw2_account)
+        if stored_user and stored_user.discord_id != str(member.id):
+            await inter.followup.send(BOT_MESSAGES['GW2_ACCOUNT_ALREADY_LINKED'])
+            return
+
+        guild_member = get_guild_member(gw2_account)
+
+        if not guild_member or guild_member.get('rank') == 'invited':
+            await member.add_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
+            user_name_set = await _set_nick_name(member, gw2_account)
+            await send_log(server, f"Transfer Student <@{member.id}> linked to {gw2_account} by {inter.user.mention}")
+            await inter.followup.send(BOT_MESSAGES['ADMIN_NOT_GUILD_MEMBER'], ephemeral=True)
+            return
+        else:
+            await _add_minimum_guild_rank(server, member)
+            user_name_set = await _set_nick_name(member, gw2_account)
+
+        upsert_user(member.id, gw2_account, None)
+
+        response = BOT_MESSAGES['ADMIN_IS_GUILD_MEMBER'].format(user_name=gw2_account, given_roles=role_name)
+        await send_log(server, f"<@{member.id}> linked to {gw2_account} by {inter.user.mention}")
         await inter.followup.send(response)
 
 
