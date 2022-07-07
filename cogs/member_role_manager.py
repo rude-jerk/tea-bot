@@ -13,6 +13,7 @@ hierarchy = GUILD['ROLES']['HIERARCHY']
 async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_name: str):
     role_rank = hierarchy[role_name]
     role_list = []
+    given_roles = []
     if role_rank > 3:
         role_rank = 3
     if role_rank == 1:
@@ -20,17 +21,16 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
     elif role_rank > 1:
         for rank in reversed(range(role_rank)):
             rank = rank + 1
-            role_list.append(GUILD['ROLES'][list(hierarchy.keys())[list(hierarchy.values()).index(rank)]])
+            role_key = list(hierarchy.keys())[list(hierarchy.values()).index(rank)]
+            given_roles.append(role_key)
+            role_list.append(GUILD['ROLES'][role_key])
     roles = [server.get_role(role) for role in role_list]
     if len(roles) > 0:
         await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
         for role in roles:
             await discord_member.add_roles(role)
 
-    if role_rank >= 1:
-        return list(hierarchy.keys())[list(hierarchy.values()).index(role_rank)]
-    else:
-        return None
+    return given_roles
 
 
 async def _add_minimum_guild_rank(server: Guild, discord_member: Member):
@@ -141,12 +141,12 @@ class MemberRoleManager(commands.Cog):
             await inter.followup.send(BOT_MESSAGES['NOT_GUILD_MEMBER'])
             return
         else:
-            highest_given_role = await _add_roles_by_guild_rank(server, member, guild_member.get('rank').upper())
+            given_roles = await _add_roles_by_guild_rank(server, member, guild_member.get('rank').upper())
             user_name_set = await _set_nick_name(member, user_name)
 
         upsert_user(inter.user.id, user_name, api_key)
 
-        response = BOT_MESSAGES['IS_GUILD_MEMBER'].format(user_name=user_name, role_name=highest_given_role)
+        response = BOT_MESSAGES['IS_GUILD_MEMBER'].format(user_name=user_name, given_roles=", ".join(given_roles))
         if user_name_set:
             response += ' ' + BOT_MESSAGES['USER_NAME_SET']
         await send_log(server, f"<@{inter.user.id}> linked to {user_name}")
