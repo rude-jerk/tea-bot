@@ -1,0 +1,2 @@
+GW2_GUILD_MEMBERS: "https://api.guildwars2.com/v2/guild/{guild_id}/members"
+GW2_ACCOUNT: "https://api.guildwars2.com/v2/account"
