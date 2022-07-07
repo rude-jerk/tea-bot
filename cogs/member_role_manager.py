@@ -41,12 +41,16 @@ async def _add_minimum_guild_rank(server: Guild, discord_member: Member):
 async def _set_nick_name(member: Member, user_name: str):
     try:
         current_nick = member.nick
+        new_nick = None
         if current_nick:
             if user_name not in current_nick:
                 new_nick = f"{current_nick} ({user_name})"
-                await member.edit(nick=new_nick)
         else:
             new_nick = f"{member.name} ({user_name})"
+
+        if new_nick:
+            if len(new_nick) >= 32:
+                return False
             await member.edit(nick=new_nick)
         return True
     except Forbidden:
@@ -98,6 +102,8 @@ class MemberRoleManager(commands.Cog):
         response = BOT_MESSAGES['IS_GUILD_MEMBER'].format(user_name=user_name, given_roles=role_name)
         if user_name_set:
             response += ' ' + BOT_MESSAGES['USER_NAME_SET']
+        else:
+            response += ' ' + BOT_MESSAGES['USER_NAME_UNSET']
         await send_log(server, f"<@{inter.user.id}> linked to {user_name}")
         await inter.followup.send(response)
 
@@ -149,6 +155,8 @@ class MemberRoleManager(commands.Cog):
         response = BOT_MESSAGES['IS_GUILD_MEMBER'].format(user_name=user_name, given_roles=", ".join(given_roles))
         if user_name_set:
             response += ' ' + BOT_MESSAGES['USER_NAME_SET']
+        else:
+            response += ' ' + BOT_MESSAGES['USER_NAME_UNSET']
         await send_log(server, f"<@{inter.user.id}> linked to {user_name}")
         await inter.followup.send(response)
 

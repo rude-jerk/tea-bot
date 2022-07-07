@@ -3,6 +3,7 @@ BAD_USER: "Uh oh, that doesn't look like a Guild Wars 2 account name! An example
 NOT_GUILD_MEMBER: "It looks like either you aren't a member of TEA or the GW2 API hasn't updated yet.\nIf you are a member, check that your username is correct and try again in 5 minutes!\nIf you are not a member and would like to join, ask in `#welcome` or message a leader.\nYou've been granted the Transfer Student role for now - `/tjoin` again after joining or if you misspelled your GW2 account name to get a guild member role!"
 IS_GUILD_MEMBER: "Welcome to the discord server, {user_name}. You've been granted the roles `{given_roles}`!"
 USER_NAME_SET: "Your nickname has been updated to include your GW2 account name!"
+USER_NAME_UNSET: "Your nickname couldn't be altered to include your GW2 account name, it's helpful to have it there - feel free to update your nickname manually to include it."
 BAD_API_KEY: "Your API key appears to be invalid, please try again with a valid API key. API keys can be generated at: https://account.arena.net/applications"
 API_WENT_WRONG: "Uh oh! Looks like something went wrong with the GW2 API, or the API is down - please try again later!"
 GW2_ACCOUNT_ALREADY_LINKED: "That GW2 account is already linked to another Discord user, contact an administrator."
