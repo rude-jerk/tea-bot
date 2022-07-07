@@ -95,7 +95,7 @@ class MemberRoleManager(commands.Cog):
 
         upsert_user(inter.user.id, user_name, None)
 
-        response = BOT_MESSAGES['IS_GUILD_MEMBER'].format(user_name=user_name, role_name=role_name)
+        response = BOT_MESSAGES['IS_GUILD_MEMBER'].format(user_name=user_name, given_roles=role_name)
         if user_name_set:
             response += ' ' + BOT_MESSAGES['USER_NAME_SET']
         await send_log(server, f"<@{inter.user.id}> linked to {user_name}")
