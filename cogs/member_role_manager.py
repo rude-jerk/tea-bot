@@ -172,6 +172,7 @@ class MemberRoleManager(commands.Cog):
     @commands.slash_command(name='tlink', description='Links a given user to a GW2 account',
                             default_member_permissions=Permissions(moderate_members=True), dm_permission=False)
     async def admin_link(self, inter: Inter, member: Member, gw2_account: str):
+        # All these duplicate code fragments need cleaning, quick work
         await inter.response.defer(ephemeral=True, with_message=True)
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
