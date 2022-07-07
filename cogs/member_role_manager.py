@@ -1,4 +1,4 @@
-from disnake import Client, Member, ApplicationCommandInteraction as Inter, Guild
+from disnake import Client, Member, ApplicationCommandInteraction as Inter, Guild, Message
 from disnake.errors import Forbidden
 from disnake.ext import commands
 
@@ -34,7 +34,10 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
 
 
 async def _add_minimum_guild_rank(server: Guild, discord_member: Member):
-    await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
+    try:
+        await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
+    except Forbidden:
+        pass
     await discord_member.add_roles(server.get_role(GUILD['ROLES']['FRESHMAN']))
 
 
@@ -60,6 +63,11 @@ async def _set_nick_name(member: Member, user_name: str):
 class MemberRoleManager(commands.Cog):
     def __init__(self, bot: Client):
         self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_message(self, message: Message):
+        if message.content.startswith('/tjoin') or message.content.startswith('/tregister'):
+            await message.reply(BOT_MESSAGES['NOT_COMMAND'], delete_after=60)
 
     @commands.Cog.listener()
     async def on_member_join(self, member: Member):
