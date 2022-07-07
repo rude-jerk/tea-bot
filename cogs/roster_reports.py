@@ -47,7 +47,7 @@ class RosterReports(commands.Cog):
         report_members = []
         for member in members:
             report_member = {'gw2_account': member['name'], 'gw2_rank': member['rank'], 'gw2_joined': member['joined']}
-            filter_member = list(filter(lambda x: x.get('gw2_account_id') == member['name'], db_members))
+            filter_member = list(filter(lambda x: x.get('gw2_account_id').lower() == member['name'].lower(), db_members))
             db_member = filter_member[0] if len(filter_member) >= 1 else {}
             member_name = None
             member_id = None
