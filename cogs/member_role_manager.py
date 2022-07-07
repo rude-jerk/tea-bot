@@ -191,6 +191,7 @@ class MemberRoleManager(commands.Cog):
         if not guild_member or guild_member.get('rank') == 'invited':
             await member.add_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
             user_name_set = await _set_nick_name(member, gw2_account)
+            upsert_user(member.id, gw2_account, None)
             await send_log(server, f"Transfer Student <@{member.id}> linked to {gw2_account} by {inter.user.mention}")
             await inter.followup.send(BOT_MESSAGES['ADMIN_NOT_GUILD_MEMBER'], ephemeral=True)
             return
