@@ -21,7 +21,7 @@ class RosterReports(commands.Cog):
             return
 
         members = sorted(members, key=itemgetter('joined'))
-        f = io.StringIO(tabulate.tabulate(members, tablefmt='psql'))
+        f = io.StringIO(tabulate.tabulate(members, tablefmt='tsv'))
 
         await inter.followup.send(file=File(fp=f, filename="in_game_roster.txt"))
 
