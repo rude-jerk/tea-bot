@@ -99,6 +99,7 @@ class MemberRoleManager(commands.Cog):
         if not guild_member or guild_member.get('rank') == 'invited':
             await member.add_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
             user_name_set = await _set_nick_name(member, user_name)
+            await send_log(server, f"Transfer Student <@{inter.user.id}> linked to {user_name}")
             await inter.followup.send(BOT_MESSAGES['NOT_GUILD_MEMBER'], ephemeral=True)
             return
         else:
@@ -165,7 +166,7 @@ class MemberRoleManager(commands.Cog):
             response += ' ' + BOT_MESSAGES['USER_NAME_SET']
         else:
             response += ' ' + BOT_MESSAGES['USER_NAME_UNSET']
-        await send_log(server, f"<@{inter.user.id}> linked to {user_name}")
+        await send_log(server, f"<@{inter.user.id}> linked to {user_name} with an API key")
         await inter.followup.send(response)
 
 
