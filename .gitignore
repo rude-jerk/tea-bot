@@ -1,5 +1,6 @@
 .idea
 configs/bot.yaml
+configs/guild.yaml
 guild_members.db
 venv
 .env
