@@ -220,11 +220,14 @@ class MemberRoleManager(commands.Cog):
                 discord_rank = GUILD['ROLES'].get(guild_rank.upper()) if guild_rank else None
                 if discord_rank:
                     if discord_rank not in member_role_ids:
-                        if discord_rank == GUILD['ROLES']['FRESHMAN']:
-                            await _add_minimum_guild_rank(server, discord_member)
-                        else:
-                            await _add_roles_by_guild_rank(server, discord_member, guild_rank.upper())
-                        await send_log(server, f"Auto updated {discord_member.mention} to {guild_rank}")
+                        try:
+                            if discord_rank == GUILD['ROLES']['FRESHMAN']:
+                                await _add_minimum_guild_rank(server, discord_member)
+                            else:
+                                await _add_roles_by_guild_rank(server, discord_member, guild_rank.upper())
+                            await send_log(server, f"Auto updated {discord_member.mention} to {guild_rank}")
+                        except Exception:
+                            pass
 
     @commands.Cog.listener()
     async def on_ready(self):
