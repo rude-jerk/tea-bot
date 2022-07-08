@@ -158,8 +158,12 @@ class MemberRoleManager(commands.Cog):
                                                                                            " ex: abcd.1234")):
         await inter.response.defer(ephemeral=True, with_message=True)
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
+        try:
+            member = server.get_member(inter.user.id)
+        except Exception:
+            await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
 
-        response = await self._handle_user_update(server, inter.user, gw2_account=user_name)
+        response = await self._handle_user_update(server, member, gw2_account=user_name)
         await inter.followup.send(response)
 
     @commands.slash_command(name='tregister', description='Grants discord roles for guild members by API key. '
@@ -169,8 +173,12 @@ class MemberRoleManager(commands.Cog):
                                                                                  description="Your GW2 API Key")):
         await inter.response.defer(ephemeral=True, with_message=True)
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
+        try:
+            member = server.get_member(inter.user.id)
+        except Exception:
+            await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
 
-        response = await self._handle_user_update(server, inter.user, api_key=api_key)
+        response = await self._handle_user_update(server, member, api_key=api_key)
         await inter.followup.send(response)
 
     @commands.slash_command(name='tlink', description='Links a given user to a GW2 account',
