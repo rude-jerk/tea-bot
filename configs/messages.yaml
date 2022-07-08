@@ -10,3 +10,5 @@ BAD_API_KEY: "Your API key appears to be invalid, please try again with a valid 
 API_WENT_WRONG: "Uh oh! Looks like something went wrong with the GW2 API, or the API is down - please try again later!"
 GW2_ACCOUNT_ALREADY_LINKED: "That GW2 account is already linked to another Discord user, contact an administrator."
 NOT_COMMAND: "Uh oh! It looks like you're trying to use a slash command and sent a message instead, try typing your slash command again and ensure the slash command shows above your text input box."
+SOMETHING_WENT_WRONG: "Something went wrong, please report this to {bot_owner}."
+ROLES_REMOVED: "Member has been unlinked from their GW2 account and all roles have been removed."

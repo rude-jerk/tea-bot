@@ -1,13 +1,16 @@
+from datetime import time
+
 from disnake import Client, Member, ApplicationCommandInteraction as Inter, Guild, Message, Permissions, User
 from disnake.errors import Forbidden
-from disnake.ext import commands
+from disnake.ext import commands, tasks
 
 from config import BOT_MESSAGES, BOT_CONFIG, GUILD
-from utils.api import get_guild_member, get_account_details
+from utils.api import get_guild_member, get_account_details, get_guild_members
 from utils.channel_logger import send_log
 from utils.users import *
 
 hierarchy = GUILD['ROLES']['HIERARCHY']
+poll_time = time(hour=10, minute=32, second=0)
 
 
 async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_name: str):
@@ -60,9 +63,85 @@ async def _set_nick_name(member: Member, user_name: str):
         return False
 
 
+async def _remove_all_roles(member: Member):
+    for role in member.roles:
+        if role.name in ('@everyone', 'everyone'):
+            continue
+        try:
+            await member.remove_roles(role)
+        except Exception:
+            pass
+
+
 class MemberRoleManager(commands.Cog):
     def __init__(self, bot: Client):
         self.bot = bot
+
+    @staticmethod
+    async def _handle_user_update(server: Guild, user: Member, gw2_account: str = None, api_key: str = None,
+                                  admin: User = None):
+        db_user = get_user_by_gw2_account_id(gw2_account)
+
+        if api_key:
+            api_success, api_response = get_account_details(api_key)
+            if not api_success:
+                return api_response
+            gw2_account = api_response.get('name')
+        else:
+            if not valid_gw2_user(gw2_account):
+                return BOT_MESSAGES['BAD_USER']
+
+        if db_user and db_user.discord_id != str(user.id):
+            if api_key:
+                remove_user_gw2_account_id(db_user.discord_id)
+
+                try:
+                    false_member = server.get_member(int(db_user.discord_id))
+                    await _remove_all_roles(false_member)
+                except Exception:
+                    pass
+
+                await send_log(server, f"User {user.mention} registered as `{gw2_account}` "
+                                       f"with an API key which was already linked to <@{db_user.discord_id}>. "
+                                       f"False user has had all roles removed.")
+            else:
+                await send_log(server,
+                               f"User {user.mention} attempted to tjoin as `{db_user}` which "
+                               f"is already linked to <@{db_user.discord_id}>")
+                return BOT_MESSAGES['GW2_ACCOUNT_ALREADY_LINKED']
+
+        guild_member = get_guild_member(gw2_account)
+        if not guild_member or guild_member.get('rank') == 'invited':
+            await user.add_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
+            await _set_nick_name(user, gw2_account)
+            upsert_user(user.id, gw2_account, api_key)
+            await send_log(server, f"Transfer Student <@{user.id}> linked to {gw2_account}")
+            return BOT_MESSAGES['NOT_GUILD_MEMBER'] if not admin else BOT_MESSAGES['ADMIN_NOT_GUILD_MEMBER']
+
+        if api_key:
+            given_roles = await _add_roles_by_guild_rank(server, user, guild_member.get('rank').upper())
+            user_name_set = await _set_nick_name(user, guild_member.get('name'))
+
+            upsert_user(user.id, guild_member.get('name'), api_key)
+            await send_log(server, f"<@{user.id}> linked to {guild_member.get('name')} with an API key.")
+            return BOT_MESSAGES['IS_GUILD_MEMBER'].format(user_name=guild_member.get('name'),
+                                                          given_roles=given_roles) + \
+                   f" {BOT_MESSAGES['USER_NAME_SET'] if user_name_set else BOT_MESSAGES['USER_NAME_UNSET']}"
+        else:
+            given_roles = 'FRESHMAN'
+            await _add_minimum_guild_rank(server, user)
+            user_name_set = await _set_nick_name(user, guild_member.get('name'))
+
+            upsert_user(user.id, guild_member.get('name'), api_key)
+            if admin:
+                await send_log(server, f"<@{user.id}> linked to {guild_member.get('name')} by {admin.mention}")
+                return BOT_MESSAGES['ADMIN_IS_GUILD_MEMBER'].format(user_name=guild_member.get('name'),
+                                                                    given_roles=given_roles)
+            else:
+                await send_log(server, f"<@{user.id}> linked to {guild_member.get('name')}")
+                return BOT_MESSAGES['IS_GUILD_MEMBER'].format(user_name=guild_member.get('name'),
+                                                              given_roles=given_roles) + \
+                       f" {BOT_MESSAGES['USER_NAME_SET'] if user_name_set else BOT_MESSAGES['USER_NAME_UNSET']}"
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
@@ -80,40 +159,7 @@ class MemberRoleManager(commands.Cog):
         await inter.response.defer(ephemeral=True, with_message=True)
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
-        role_name = 'Freshman'
-        if not valid_gw2_user(user_name):
-            await inter.followup.send(BOT_MESSAGES['BAD_USER'])
-            return
-
-        stored_user = get_user_by_gw2_account_id(user_name)
-        if stored_user and stored_user.discord_id != str(inter.user.id):
-            await send_log(server,
-                           f"User <@{inter.user.id}> attempted to tjoin as `{user_name}` which "
-                           f"is already linked to <@{stored_user.discord_id}>")
-            await inter.followup.send(BOT_MESSAGES['GW2_ACCOUNT_ALREADY_LINKED'])
-            return
-
-        guild_member = get_guild_member(user_name)
-        member = server.get_member(inter.user.id)
-
-        if not guild_member or guild_member.get('rank') == 'invited':
-            await member.add_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
-            user_name_set = await _set_nick_name(member, user_name)
-            await send_log(server, f"Transfer Student <@{inter.user.id}> linked to {user_name}")
-            await inter.followup.send(BOT_MESSAGES['NOT_GUILD_MEMBER'], ephemeral=True)
-            return
-        else:
-            await _add_minimum_guild_rank(server, member)
-            user_name_set = await _set_nick_name(member, user_name)
-
-        upsert_user(inter.user.id, user_name, None)
-
-        response = BOT_MESSAGES['IS_GUILD_MEMBER'].format(user_name=user_name, given_roles=role_name)
-        if user_name_set:
-            response += ' ' + BOT_MESSAGES['USER_NAME_SET']
-        else:
-            response += ' ' + BOT_MESSAGES['USER_NAME_UNSET']
-        await send_log(server, f"<@{inter.user.id}> linked to {user_name}")
+        response = await self._handle_user_update(server, inter.user, gw2_account=user_name)
         await inter.followup.send(response)
 
     @commands.slash_command(name='tregister', description='Grants discord roles for guild members by API key. '
@@ -124,86 +170,65 @@ class MemberRoleManager(commands.Cog):
         await inter.response.defer(ephemeral=True, with_message=True)
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
-        api_success, api_response = get_account_details(api_key)
-        if not api_success:
-            await inter.followup.send(api_response)
-            return
-
-        user_name = api_response.get('name')
-        guild_member = get_guild_member(user_name)
-        member = server.get_member(inter.user.id)
-
-        stored_user = get_user_by_gw2_account_id(user_name)
-        if stored_user and stored_user.discord_id != str(inter.user.id):
-            remove_user_gw2_account_id(stored_user.discord_id)
-            try:
-                false_member = server.get_member(int(stored_user.discord_id))
-                for role in false_member.roles:
-                    try:
-                        await false_member.remove_roles(role)
-                    except Exception:
-                        pass
-            except Exception:
-                pass
-
-            await send_log(server, f"User <@{inter.user.id}> registered as `{user_name}` "
-                                   f"with an API key which was already linked to <@{stored_user.discord_id}>. "
-                                   f"False user has had all roles removed.")
-
-        if not guild_member or guild_member.get('rank') == 'invited':
-            await member.add_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
-            user_name_set = await _set_nick_name(member, user_name)
-            await inter.followup.send(BOT_MESSAGES['NOT_GUILD_MEMBER'])
-            return
-        else:
-            given_roles = await _add_roles_by_guild_rank(server, member, guild_member.get('rank').upper())
-            user_name_set = await _set_nick_name(member, user_name)
-
-        upsert_user(inter.user.id, user_name, api_key)
-
-        response = BOT_MESSAGES['IS_GUILD_MEMBER'].format(user_name=user_name, given_roles=", ".join(given_roles))
-        if user_name_set:
-            response += ' ' + BOT_MESSAGES['USER_NAME_SET']
-        else:
-            response += ' ' + BOT_MESSAGES['USER_NAME_UNSET']
-        await send_log(server, f"<@{inter.user.id}> linked to {user_name} with an API key")
+        response = await self._handle_user_update(server, inter.user, api_key=api_key)
         await inter.followup.send(response)
 
     @commands.slash_command(name='tlink', description='Links a given user to a GW2 account',
                             default_member_permissions=Permissions(moderate_members=True), dm_permission=False)
     async def admin_link(self, inter: Inter, member: Member, gw2_account: str):
-        # All these duplicate code fragments need cleaning, quick work
         await inter.response.defer(ephemeral=True, with_message=True)
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
-        role_name = 'Freshman'
-        if not valid_gw2_user(gw2_account):
-            await inter.followup.send(BOT_MESSAGES['BAD_USER'])
-            return
-
-        stored_user = get_user_by_gw2_account_id(gw2_account)
-        if stored_user and stored_user.discord_id != str(member.id):
-            await inter.followup.send(BOT_MESSAGES['GW2_ACCOUNT_ALREADY_LINKED'])
-            return
-
-        guild_member = get_guild_member(gw2_account)
-
-        if not guild_member or guild_member.get('rank') == 'invited':
-            await member.add_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
-            user_name_set = await _set_nick_name(member, gw2_account)
-            upsert_user(member.id, gw2_account, None)
-            await send_log(server, f"Transfer Student <@{member.id}> linked to {gw2_account} by {inter.user.mention}")
-            await inter.followup.send(BOT_MESSAGES['ADMIN_NOT_GUILD_MEMBER'], ephemeral=True)
-            return
-        else:
-            await _add_minimum_guild_rank(server, member)
-            user_name_set = await _set_nick_name(member, gw2_account)
-
-        upsert_user(member.id, gw2_account, None)
-
-        response = BOT_MESSAGES['ADMIN_IS_GUILD_MEMBER'].format(user_name=gw2_account, given_roles=role_name)
-        await send_log(server, f"<@{member.id}> linked to {gw2_account} by {inter.user.mention}")
+        response = await self._handle_user_update(server, member, gw2_account=gw2_account, admin=inter.user)
         await inter.followup.send(response)
+
+    @commands.slash_command(name='tunlink', description='Removes given member\'s link to their GW2 account',
+                            default_member_permissions=Permissions(moderate_members=True), dm_permission=False)
+    async def admin_unlink(self, inter: Inter, member: Member):
+        await inter.response.defer(ephemeral=True, with_message=True)
+        server = self.bot.get_guild(BOT_CONFIG['SERVER'])
+
+        remove_user_gw2_account_id(str(member.id))
+        await _remove_all_roles(member)
+        await send_log(server, f"{member.mention} unlinked by {inter.user.mention} and has had all roles removed.")
+        await inter.followup.send(BOT_MESSAGES['ROLES_REMOVED'])
+
+    @tasks.loop(time=poll_time)
+    async def auto_update_roles(self):
+        server = self.bot.get_guild(BOT_CONFIG['SERVER'])
+
+        discord_members = server.members
+        guild_members = get_guild_members()
+        db_members = get_all_db_users()
+
+        for db_member in db_members:
+            if db_member.get('gw2_account_id') is None or db_member.get('discord_id') is None:
+                continue
+
+            f_discord_member = [member for member in discord_members if str(member.id) == db_member.get('discord_id')]
+            f_guild_member = [member for member in guild_members if
+                              member['name'].lower() == db_member.get('gw2_account_id').lower()]
+
+            if len(f_discord_member) > 0 and len(f_guild_member) > 0:
+                discord_member = f_discord_member[0]
+                guild_member = f_guild_member[0]
+
+                member_role_ids = [role.id for role in discord_member.roles]
+                guild_rank = guild_member.get('rank')
+                if not db_member.get('gw2_api_key') and guild_rank:
+                    guild_rank = 'FRESHMAN'
+                discord_rank = GUILD['ROLES'].get(guild_rank.upper()) if guild_rank else None
+                if discord_rank:
+                    if discord_rank not in member_role_ids:
+                        if discord_rank == GUILD['ROLES']['FRESHMAN']:
+                            await _add_minimum_guild_rank(server, discord_member)
+                        else:
+                            await _add_roles_by_guild_rank(server, discord_member, guild_rank.upper())
+                        await send_log(server, f"Auto updated {discord_member.mention} to {guild_rank}")
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.auto_update_roles.start()
 
 
 def setup(bot):

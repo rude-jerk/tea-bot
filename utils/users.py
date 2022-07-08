@@ -27,7 +27,7 @@ def get_user_by_gw2_account_id(account_id: str):
 
 def remove_user_gw2_account_id(discord_id: str):
     success = db_session.query(GuildMember).filter(GuildMember.discord_id == discord_id).update(
-        {GuildMember.gw2_account_id: None})
+        {GuildMember.gw2_account_id: None, GuildMember.gw2_api_key: None})
     db_session.commit()
     return success
 
