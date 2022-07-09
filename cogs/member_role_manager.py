@@ -13,7 +13,7 @@ hierarchy = GUILD['ROLES']['HIERARCHY']
 poll_time = time(hour=10, minute=32, second=0)
 
 
-async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_name: str):
+async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_name: str, auto: bool = False):
     role_rank = hierarchy[role_name]
     role_list = []
     given_roles = []
@@ -31,17 +31,18 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
     if len(roles) > 0:
         await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
         for role in roles:
-            await discord_member.add_roles(role, reason=f"[API Key] Guild Role: {role_name}")
+            await discord_member.add_roles(role, reason=f"{'[AUTO]' if auto else ''}[API Key] Guild Role: {role_name}")
 
     return given_roles
 
 
-async def _add_minimum_guild_rank(server: Guild, discord_member: Member, guild_rank: str):
+async def _add_minimum_guild_rank(server: Guild, discord_member: Member, guild_rank: str, auto: bool = False):
     try:
         await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
     except Forbidden:
         pass
-    await discord_member.add_roles(server.get_role(GUILD['ROLES']['FRESHMAN']), reason=f"Guild Role: {guild_rank}")
+    await discord_member.add_roles(server.get_role(GUILD['ROLES']['FRESHMAN']),
+                                   reason=f"{'[AUTO] ' if auto else ''}Guild Role: {guild_rank}")
 
 
 async def _set_nick_name(member: Member, user_name: str):
@@ -237,9 +238,10 @@ class MemberRoleManager(commands.Cog):
                     if discord_rank not in member_role_ids:
                         try:
                             if discord_rank == GUILD['ROLES']['FRESHMAN']:
-                                await _add_minimum_guild_rank(server, discord_member, guild_member.get('rank').upper())
+                                await _add_minimum_guild_rank(server, discord_member, guild_member.get('rank').upper(),
+                                                              auto=True)
                             else:
-                                await _add_roles_by_guild_rank(server, discord_member, guild_rank.upper())
+                                await _add_roles_by_guild_rank(server, discord_member, guild_rank.upper(), auto=True)
                             await send_log(server, f"Auto updated {discord_member.mention} to `{guild_rank}`")
                         except Exception:
                             pass
