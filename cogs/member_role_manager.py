@@ -31,17 +31,17 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
     if len(roles) > 0:
         await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
         for role in roles:
-            await discord_member.add_roles(role)
+            await discord_member.add_roles(role, reason=f"[API Key] Guild Role: {role_name}")
 
     return given_roles
 
 
-async def _add_minimum_guild_rank(server: Guild, discord_member: Member):
+async def _add_minimum_guild_rank(server: Guild, discord_member: Member, guild_rank: str):
     try:
         await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
     except Forbidden:
         pass
-    await discord_member.add_roles(server.get_role(GUILD['ROLES']['FRESHMAN']))
+    await discord_member.add_roles(server.get_role(GUILD['ROLES']['FRESHMAN']), reason=f"Guild Role: {guild_rank}")
 
 
 async def _set_nick_name(member: Member, user_name: str):
@@ -129,7 +129,7 @@ class MemberRoleManager(commands.Cog):
                    f" {BOT_MESSAGES['USER_NAME_SET'] if user_name_set else BOT_MESSAGES['USER_NAME_UNSET']}"
         else:
             given_roles = 'FRESHMAN'
-            await _add_minimum_guild_rank(server, user)
+            await _add_minimum_guild_rank(server, user, guild_member.get('rank').upper())
             user_name_set = await _set_nick_name(user, guild_member.get('name'))
 
             upsert_user(user.id, guild_member.get('name'), api_key)
@@ -237,7 +237,7 @@ class MemberRoleManager(commands.Cog):
                     if discord_rank not in member_role_ids:
                         try:
                             if discord_rank == GUILD['ROLES']['FRESHMAN']:
-                                await _add_minimum_guild_rank(server, discord_member)
+                                await _add_minimum_guild_rank(server, discord_member, guild_member.get('rank').upper())
                             else:
                                 await _add_roles_by_guild_rank(server, discord_member, guild_rank.upper())
                             await send_log(server, f"Auto updated {discord_member.mention} to `{guild_rank}`")
