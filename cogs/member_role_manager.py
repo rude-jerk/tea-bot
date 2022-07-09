@@ -17,8 +17,8 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
     role_rank = hierarchy[role_name]
     role_list = []
     given_roles = []
-    if role_rank > 3:
-        role_rank = 3
+    if role_rank > GUILD['BOT_MAX_HIERARCHY']:
+        role_rank = GUILD['BOT_MAX_HIERARCHY']
     if role_rank == 1:
         role_list.append(GUILD['ROLES'][role_name])
     elif role_rank > 1:
@@ -80,8 +80,6 @@ class MemberRoleManager(commands.Cog):
     @staticmethod
     async def _handle_user_update(server: Guild, user: Member, gw2_account: str = None, api_key: str = None,
                                   admin: User = None):
-        db_user = get_user_by_gw2_account_id(gw2_account)
-
         if api_key:
             api_success, api_response = get_account_details(api_key)
             if not api_success:
@@ -90,6 +88,8 @@ class MemberRoleManager(commands.Cog):
         else:
             if not valid_gw2_user(gw2_account):
                 return BOT_MESSAGES['BAD_USER']
+
+        db_user = get_user_by_gw2_account_id(gw2_account)
 
         if db_user and db_user.discord_id != str(user.id):
             if api_key:
@@ -225,7 +225,14 @@ class MemberRoleManager(commands.Cog):
                 guild_rank = guild_member.get('rank')
                 if not db_member.get('gw2_api_key') and guild_rank:
                     guild_rank = 'FRESHMAN'
-                discord_rank = GUILD['ROLES'].get(guild_rank.upper()) if guild_rank else None
+
+                hierarchy_rank = GUILD['ROLES']['HIERARCHY'].get(guild_rank.upper()) if guild_rank else None
+                if hierarchy_rank and hierarchy_rank > GUILD['BOT_MAX_HIERARCHY']:
+                    guild_rank = 'PREFECT'
+                    discord_rank = GUILD['BOT_MAX_RANK']
+                else:
+                    discord_rank = GUILD['ROLES'].get(guild_rank.upper()) if guild_rank else None
+
                 if discord_rank:
                     if discord_rank not in member_role_ids:
                         try:
@@ -233,7 +240,7 @@ class MemberRoleManager(commands.Cog):
                                 await _add_minimum_guild_rank(server, discord_member)
                             else:
                                 await _add_roles_by_guild_rank(server, discord_member, guild_rank.upper())
-                            await send_log(server, f"Auto updated {discord_member.mention} to {guild_rank}")
+                            await send_log(server, f"Auto updated {discord_member.mention} to `{guild_rank}`")
                         except Exception:
                             pass
 
