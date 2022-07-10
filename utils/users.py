@@ -1,7 +1,8 @@
 from sqlalchemy import func
+from datetime import datetime, timedelta
 
 from bot import db_session
-from models.guild_members import GuildMember
+from models.guild_members import GuildMember, Visitor
 
 
 def valid_gw2_user(user_name: str):
@@ -44,6 +45,37 @@ def upsert_user(discord_id, account_id, api_key):
         member.gw2_account_id = account_id
         db_session.add(member)
     db_session.commit()
+
+
+def create_visitor(discord_id):
+    visitor: Visitor = db_session.query(Visitor).filter(Visitor.discord_id == discord_id).first()
+    if visitor:
+        return
+    else:
+        visitor = Visitor()
+        visitor.discord_id = discord_id
+        db_session.add(visitor)
+        db_session.commit()
+
+
+def remove_visitor(discord_id):
+    visitor: Visitor = db_session.query(Visitor).filter(Visitor.discord_id == discord_id).first()
+    if not visitor:
+        return
+    else:
+        db_session.delete(visitor)
+        db_session.commit()
+
+
+def get_expired_visitors():
+    expire_time = datetime.now() - timedelta(hours=24)
+    visitors = db_session.query(Visitor).filter(Visitor.role_time < expire_time).all()
+    return [visitor.discord_id for visitor in visitors]
+
+
+def get_all_visitors():
+    visitors = db_session.query(Visitor).all()
+    return [visitor.discord_id for visitor in visitors]
 
 
 def get_all_db_users():

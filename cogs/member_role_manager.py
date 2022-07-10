@@ -1,10 +1,10 @@
-from datetime import time
-
-from disnake import Client, Member, ApplicationCommandInteraction as Inter, Guild, Message, Permissions, User
+from disnake import Member, ApplicationCommandInteraction as Inter, Guild, Message, Permissions, User
 from disnake.errors import Forbidden
 from disnake.ext import commands, tasks
+from disnake.ext.commands import Bot
 
 from config import BOT_MESSAGES, BOT_CONFIG, GUILD
+from interface.views.visitor_view import VisitorView
 from utils.api import get_guild_member, get_account_details, get_guild_members
 from utils.channel_logger import send_log
 from utils.users import *
@@ -28,7 +28,12 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
             role_list.append(GUILD['ROLES'][role_key])
     roles = [server.get_role(role) for role in role_list]
     if len(roles) > 0:
-        await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
+        try:
+            await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
+            await discord_member.remove_roles(server.get_role(GUILD['ROLES']['VISITOR']))
+            remove_visitor(str(discord_member.id))
+        except Exception:
+            pass
         for role in roles:
             await discord_member.add_roles(role, reason=f"{'[AUTO]' if auto else ''}[API Key] Guild Role: {role_name}")
 
@@ -38,7 +43,9 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
 async def _add_minimum_guild_rank(server: Guild, discord_member: Member, guild_rank: str, auto: bool = False):
     try:
         await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
-    except Forbidden:
+        await discord_member.remove_roles(server.get_role(GUILD['ROLES']['VISITOR']))
+        remove_visitor(str(discord_member.id))
+    except Exception:
         pass
     await discord_member.add_roles(server.get_role(GUILD['ROLES']['FRESHMAN']),
                                    reason=f"{'[AUTO] ' if auto else ''}Guild Role: {guild_rank}")
@@ -74,7 +81,7 @@ async def _remove_all_roles(member: Member):
 
 
 class MemberRoleManager(commands.Cog):
-    def __init__(self, bot: Client):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @staticmethod
@@ -154,7 +161,26 @@ class MemberRoleManager(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: Member):
-        await member.send(BOT_MESSAGES['WELCOME_MESSAGE'])
+        try:
+            await member.send(BOT_MESSAGES['WELCOME_MESSAGE'], view=VisitorView(self.bot, member.id), delete_after=120)
+        except Forbidden:
+            welcome_channel = self.bot.get_channel(BOT_CONFIG['WELCOME_CHANNEL'])
+            await welcome_channel.send(f"{member.mention} " + BOT_MESSAGES['WELCOME_MESSAGE'],
+                                       view=VisitorView(self.bot, member.id), delete_after=120)
+
+    @commands.slash_command(name='twelcome', description="Resends the welcome message", dm_permission=True)
+    async def run_test(self, inter: Inter):
+        await inter.response.defer(ephemeral=True, with_message=True)
+
+        server = self.bot.get_guild(BOT_CONFIG['SERVER'])
+        try:
+            member = server.get_member(inter.user.id)
+        except Exception:
+            await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
+            return
+
+        await inter.followup.send(BOT_MESSAGES['CHECK_DMS'])
+        await self.on_member_join(member)
 
     @commands.slash_command(name='tjoin', description='Grants discord roles for guild members.', dm_permission=True)
     async def join_discord(self, inter: Inter, user_name: str = commands.Param(name="username",
@@ -166,6 +192,7 @@ class MemberRoleManager(commands.Cog):
             member = server.get_member(inter.user.id)
         except Exception:
             await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
+            return
 
         response = await self._handle_user_update(server, member, gw2_account=user_name)
         await inter.followup.send(response)
@@ -181,6 +208,7 @@ class MemberRoleManager(commands.Cog):
             member = server.get_member(inter.user.id)
         except Exception:
             await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
+            return
 
         response = await self._handle_user_update(server, member, api_key=api_key)
         await inter.followup.send(response)

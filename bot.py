@@ -25,4 +25,5 @@ async def on_ready():
 if __name__ == '__main__':
     bot.load_extension('cogs.member_role_manager')
     bot.load_extension('cogs.roster_reports')
+    bot.load_extension('cogs.visitor_manager')
     bot.run(BOT_CONFIG['BOT_TOKEN'])
