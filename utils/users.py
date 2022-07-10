@@ -36,7 +36,7 @@ def upsert_user(discord_id, account_id, api_key):
     member: GuildMember = db_session.query(GuildMember).filter(GuildMember.discord_id == discord_id).first()
     if member:
         member.gw2_account_id = account_id
-        member.gw2_api_key = api_key
+        member.gw2_api_key = api_key if api_key else member.gw2_api_key
     else:
         member = GuildMember()
         member.discord_id = discord_id
