@@ -178,8 +178,8 @@ class MemberRoleManager(commands.Cog):
         except Exception:
             await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
             return
-
-        await inter.followup.send(BOT_MESSAGES['CHECK_DMS'])
+        if inter.guild_id:
+            await inter.followup.send(BOT_MESSAGES['CHECK_DMS'])
         await self.on_member_join(member)
 
     @commands.slash_command(name='tjoin', description='Grants discord roles for guild members.', dm_permission=True)
