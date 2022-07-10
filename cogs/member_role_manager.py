@@ -147,7 +147,11 @@ class MemberRoleManager(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: Message):
         if message.content.startswith('/tjoin') or message.content.startswith('/tregister'):
-            await message.reply(BOT_MESSAGES['NOT_COMMAND'], delete_after=60)
+            try:
+                await message.reply(BOT_MESSAGES['NOT_COMMAND'], delete_after=60)
+            except Forbidden:
+                print(f"Unable to reply to message [{message.content}] from "
+                      f"[{message.author.display_name}] in [{message.channel.name}]")
 
     @commands.Cog.listener()
     async def on_member_join(self, member: Member):
