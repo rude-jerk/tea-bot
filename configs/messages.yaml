@@ -16,4 +16,4 @@ NOT_DISCORD_MEMBER: "Uh oh, it looks like you might not be a member of the TEA d
 JUST_VISITING_CLICK: "You've been granted the role `Visitor` - you'll be able to temporarily access our voice channels, but the visitor role is automatically removed after 24 hours! If you choose to stick around, try `/tjoin`!"
 NOT_YOUR_BUTTON: "Woah, that button isn't for you!"
 CHECK_DMS: "A message has been sent to you privately!"
-VISITOR_EXPIRED: "Your `Visitor` role has expired and has been removed, to get it again use the `/twelcome` command, or consider joining as a Transfer Student with `/tjoin`"
+VISITOR_EXPIRED: "Your `Visitor` role has expired and has been removed, to get it again use the `/twelcome` command, or consider joining as a Transfer Student with `/tjoin` if you haven't already!"

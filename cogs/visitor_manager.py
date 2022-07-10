@@ -24,6 +24,7 @@ class VisitorManager(commands.Cog):
                     await role_visitor.remove_roles(visitor_role)
                     await send_log(server, f"Visitor role removed from {role_visitor.mention}")
                     remove_visitor(str(role_visitor.id))
+                    await role_visitor.send(BOT_MESSAGES['VISITOR_EXPIRED'])
                 except Exception:
                     pass
 
