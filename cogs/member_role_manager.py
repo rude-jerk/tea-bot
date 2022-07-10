@@ -10,7 +10,6 @@ from utils.channel_logger import send_log
 from utils.users import *
 
 hierarchy = GUILD['ROLES']['HIERARCHY']
-poll_time = time(hour=10, minute=32, second=0)
 
 
 async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_name: str, auto: bool = False):
@@ -206,7 +205,7 @@ class MemberRoleManager(commands.Cog):
         await send_log(server, f"{member.mention} unlinked by {inter.user.mention} and has had all roles removed.")
         await inter.followup.send(BOT_MESSAGES['ROLES_REMOVED'])
 
-    @tasks.loop(time=poll_time)
+    @tasks.loop(hours=8)
     async def auto_update_roles(self):
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
