@@ -239,6 +239,7 @@ class MemberRoleManager(commands.Cog):
         await _remove_all_roles(member)
         await send_log(server, f"{member.mention} unlinked by {inter.user.mention} and has had all roles removed.")
         await inter.followup.send(BOT_MESSAGES['ROLES_REMOVED'])
+
     @tasks.loop(hours=8)
     async def auto_update_roles(self):
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
