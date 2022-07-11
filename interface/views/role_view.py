@@ -31,7 +31,7 @@ class ReactRoleView(View):
             else:
                 await member.add_roles(role)
                 return ReactRoleResponse.ADDED_ROLE
-        except:
+        except Exception:
             return ReactRoleResponse.ERROR
 
     async def handle_click(self, inter: MessageInteraction, role: str):
