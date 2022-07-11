@@ -182,7 +182,7 @@ class MemberRoleManager(commands.Cog):
             await inter.followup.send(BOT_MESSAGES['CHECK_DMS'])
         await self.on_member_join(member)
 
-    @commands.slash_command(name='twelcomea', description="Force resend the welcome message to a member")
+    @commands.slash_command(name='twelcome_push', description="Force resend the welcome message to a member")
     async def admin_welcome(self, inter: Inter, member: Member,
                             default_member_permissions=Permissions(moderate_members=True), dm_permission=False):
         await inter.response.defer(ephemeral=True, with_message=True)
