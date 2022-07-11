@@ -30,4 +30,3 @@ def get_account_details(api_key: str):
         return False, BOT_MESSAGES['BAD_API_KEY']
     else:
         return False, BOT_MESSAGES['API_WENT_WRONG']
-

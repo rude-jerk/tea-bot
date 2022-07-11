@@ -1,10 +1,11 @@
+from os.path import dirname, join
+
 from disnake import Intents
 from disnake.ext import commands
-
-from config import BOT_CONFIG
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, declarative_base
-from os.path import dirname, join
+
+from config import BOT_CONFIG
 
 intents = Intents.all()
 this_dir = dirname(__file__)

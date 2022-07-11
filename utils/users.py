@@ -1,5 +1,6 @@
-from sqlalchemy import func
 from datetime import datetime, timedelta
+
+from sqlalchemy import func
 
 from bot import db_session
 from models.guild_members import GuildMember, Visitor
@@ -22,7 +23,7 @@ def get_user_by_discord_id(discord_id: str):
 
 
 def get_user_by_gw2_account_id(account_id: str):
-    return db_session.query(GuildMember).\
+    return db_session.query(GuildMember). \
         filter(func.lower(GuildMember.gw2_account_id) == func.lower(account_id)).first()
 
 

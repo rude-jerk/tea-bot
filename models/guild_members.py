@@ -1,5 +1,5 @@
-from sqlalchemy import Column, String, DateTime
-from sqlalchemy import func
+from sqlalchemy import Column, String, DateTime, func
+
 from bot import db_base
 
 

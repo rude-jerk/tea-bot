@@ -1,5 +1,6 @@
-import yaml
 from os.path import dirname, join
+
+import yaml
 
 this_dir = dirname(__file__)
 

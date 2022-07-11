@@ -1,8 +1,9 @@
 from disnake.ext import commands, tasks
 from disnake.ext.commands import Bot
+
 from config import BOT_CONFIG, GUILD, BOT_MESSAGES
-from utils.users import get_expired_visitors, get_all_visitors, remove_visitor
 from utils.channel_logger import send_log
+from utils.users import get_expired_visitors, get_all_visitors, remove_visitor
 
 
 class VisitorManager(commands.Cog):
@@ -27,8 +28,6 @@ class VisitorManager(commands.Cog):
                     await role_visitor.send(BOT_MESSAGES['VISITOR_EXPIRED'])
                 except Exception:
                     pass
-
-
 
     @commands.Cog.listener()
     async def on_ready(self):
