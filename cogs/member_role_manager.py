@@ -56,10 +56,12 @@ async def _set_nick_name(member: Member, user_name: str):
         current_nick = member.nick
         new_nick = None
         if current_nick:
-            if user_name.lower() not in current_nick.lower():
+            if user_name.split(".")[0] == current_nick.lower().strip():
+                new_nick = user_name
+            elif user_name.lower() not in current_nick.lower():
                 new_nick = f"{current_nick} ({user_name})"
         else:
-            new_nick = f"{member.name} ({user_name})"
+            new_nick = user_name
 
         if new_nick:
             if len(new_nick) >= 32:
