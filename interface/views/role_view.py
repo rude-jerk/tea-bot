@@ -40,13 +40,12 @@ class ReactRoleView(View):
 
         role_handled = await self.role_from_button(server, inter.user.id, GUILD['REACT'].get(role))
 
-        match role_handled:
-            case ReactRoleResponse.ADDED_ROLE:
-                await inter.followup.send(BOT_MESSAGES['REACT_ROLE_ADD'].format(role_name=role))
-            case ReactRoleResponse.REMOVED_ROLE:
-                await inter.followup.send(BOT_MESSAGES['REACT_ROLE_REMOVE'].format(role_name=role))
-            case _:
-                await inter.followup.send(BOT_MESSAGES['SOMETHING_WENT_WRONG'].format(bot_owner=BOT_CONFIG['OWNER']))
+        if role_handled == ReactRoleResponse.ADDED_ROLE:
+            await inter.followup.send(BOT_MESSAGES['REACT_ROLE_ADD'].format(role_name=role))
+        elif role_handled == ReactRoleResponse.REMOVED_ROLE:
+            await inter.followup.send(BOT_MESSAGES['REACT_ROLE_REMOVE'].format(role_name=role))
+        else:
+            await inter.followup.send(BOT_MESSAGES['SOMETHING_WENT_WRONG'].format(bot_owner=BOT_CONFIG['OWNER']))
 
     @button(label="Raids", style=ButtonStyle.blurple, custom_id='btn_tea_RAID')
     async def get_raid_role(self, this_button: Button, inter: MessageInteraction):
