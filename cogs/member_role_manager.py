@@ -56,8 +56,14 @@ async def _set_nick_name(member: Member, user_name: str):
         current_nick = member.nick
         new_nick = None
         if current_nick:
-            if user_name.split(".")[0] == current_nick.lower().strip():
+            if user_name.lower().split(".")[0] == current_nick.lower().strip():
                 new_nick = user_name
+            elif user_name.lower().split(".")[0] in current_nick.lower():
+                nick_position = current_nick.lower().find(user_name.lower().split(".")[0])
+                if nick_position >= 0:
+                    new_nick_pre = current_nick[:nick_position]
+                    new_nick_suf = current_nick[nick_position+len(user_name.split(".")[0]):]
+                    new_nick = new_nick_pre + user_name + new_nick_suf
             elif user_name.lower() not in current_nick.lower():
                 new_nick = f"{current_nick} ({user_name})"
         else:
