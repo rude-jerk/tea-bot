@@ -162,7 +162,7 @@ class MemberRoleManager(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member: Member):
         try:
-            await member.send(BOT_MESSAGES['WELCOME_MESSAGE'], view=VisitorView(self.bot, member.id), delete_after=300)
+            await member.send(BOT_MESSAGES['WELCOME_MESSAGE'], view=VisitorView(self.bot, member.id))
         except Forbidden:
             welcome_channel = self.bot.get_channel(BOT_CONFIG['WELCOME_CHANNEL'])
             await welcome_channel.send(f"{member.mention} " + BOT_MESSAGES['WELCOME_MESSAGE'],
