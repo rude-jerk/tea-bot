@@ -162,14 +162,14 @@ class MemberRoleManager(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member: Member):
         try:
-            await member.send(BOT_MESSAGES['WELCOME_MESSAGE'], view=VisitorView(self.bot, member.id), delete_after=120)
+            await member.send(BOT_MESSAGES['WELCOME_MESSAGE'], view=VisitorView(self.bot, member.id), delete_after=300)
         except Forbidden:
             welcome_channel = self.bot.get_channel(BOT_CONFIG['WELCOME_CHANNEL'])
             await welcome_channel.send(f"{member.mention} " + BOT_MESSAGES['WELCOME_MESSAGE'],
-                                       view=VisitorView(self.bot, member.id), delete_after=120)
+                                       view=VisitorView(self.bot, member.id), delete_after=300)
 
     @commands.slash_command(name='twelcome', description="Resends the welcome message", dm_permission=True)
-    async def run_test(self, inter: Inter):
+    async def welcome(self, inter: Inter):
         await inter.response.defer(ephemeral=True, with_message=True)
 
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
@@ -181,6 +181,13 @@ class MemberRoleManager(commands.Cog):
         if inter.guild_id:
             await inter.followup.send(BOT_MESSAGES['CHECK_DMS'])
         await self.on_member_join(member)
+
+    @commands.slash_command(name='twelcomea', description="Force resend the welcome message to a member")
+    async def admin_welcome(self, inter: Inter, member: Member,
+                            default_member_permissions=Permissions(moderate_members=True), dm_permission=False):
+        await inter.response.defer(ephemeral=True, with_message=True)
+        await self.on_member_join(member)
+        await inter.followup.send(f'Welcome message sent to {member.mention}')
 
     @commands.slash_command(name='tjoin', description='Grants discord roles for guild members.', dm_permission=True)
     async def join_discord(self, inter: Inter, user_name: str = commands.Param(name="username",
@@ -232,7 +239,6 @@ class MemberRoleManager(commands.Cog):
         await _remove_all_roles(member)
         await send_log(server, f"{member.mention} unlinked by {inter.user.mention} and has had all roles removed.")
         await inter.followup.send(BOT_MESSAGES['ROLES_REMOVED'])
-
     @tasks.loop(hours=8)
     async def auto_update_roles(self):
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])

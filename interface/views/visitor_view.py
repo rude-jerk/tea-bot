@@ -11,7 +11,7 @@ class VisitorView(View):
     def __init__(self, bot: Bot, user_id: int):
         self.bot = bot
         self.user_id = user_id
-        super().__init__(timeout=120)
+        super().__init__(timeout=5 * 60)
 
     @button(label="I'm just visiting!", style=ButtonStyle.blurple)
     async def get_visitor_role(self, this_button: Button, inter: MessageInteraction):
