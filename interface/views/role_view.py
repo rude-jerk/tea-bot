@@ -47,14 +47,14 @@ class ReactRoleView(View):
         else:
             await inter.followup.send(BOT_MESSAGES['SOMETHING_WENT_WRONG'].format(bot_owner=BOT_CONFIG['OWNER']))
 
-    @button(label="Raids", style=ButtonStyle.blurple, custom_id='btn_tea_RAID')
+    @button(label="Raids", style=ButtonStyle.red, custom_id='btn_tea_RAID')
     async def get_raid_role(self, this_button: Button, inter: MessageInteraction):
         await self.handle_click(inter, 'RAIDS')
 
-    @button(label='Fractals', style=ButtonStyle.green, custom_id='btn_tea_FRACTAL')
+    @button(label='Fractals', style=ButtonStyle.blurple, custom_id='btn_tea_FRACTAL')
     async def get_fractal_role(self, this_button: Button, inter: MessageInteraction):
         await self.handle_click(inter, 'FRACTALS')
 
-    @button(label='Strikes', style=ButtonStyle.red, custom_id='btn_tea_STRIKE')
+    @button(label='Strikes', style=ButtonStyle.green, custom_id='btn_tea_STRIKE')
     async def get_strike_role(self, this_button: Button, inter: MessageInteraction):
         await self.handle_click(inter, 'STRIKES')
