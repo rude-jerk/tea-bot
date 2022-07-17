@@ -4,11 +4,11 @@ from disnake import Member
 from disnake.ext import commands, tasks
 from disnake.ext.commands import Bot
 
-from config import BOT_CONFIG, GUILD, BOT_MESSAGES
+from config import BOT_CONFIG, GUILD, BOT_MESSAGES, LOG_NAME
 from utils.channel_logger import send_log
 from utils.users import get_expired_visitors, get_all_visitors, remove_visitor, create_visitor
 
-logger = logging.getLogger('tea_discord')
+logger = logging.getLogger(LOG_NAME)
 
 
 class VisitorManager(commands.Cog):

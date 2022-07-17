@@ -4,10 +4,10 @@ from disnake import ButtonStyle, MessageInteraction
 from disnake.ext.commands import Bot
 from disnake.ui import View, button, Button
 
-from config import BOT_CONFIG, GUILD, BOT_MESSAGES
+from config import BOT_CONFIG, GUILD, BOT_MESSAGES, LOG_NAME
 from utils.channel_logger import send_log
 
-logger = logging.getLogger('tea_discord')
+logger = logging.getLogger(LOG_NAME)
 
 
 class VisitorView(View):

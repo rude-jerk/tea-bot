@@ -7,12 +7,12 @@ from disnake.ext import commands
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, declarative_base
 
-from config import BOT_CONFIG
+from config import BOT_CONFIG, LOG_NAME
 
 intents = Intents.all()
 this_dir = dirname(__file__)
 
-logger = logging.getLogger('tea_discord')
+logger = logging.getLogger(LOG_NAME)
 logger.setLevel(logging.DEBUG)
 if not len(logger.handlers):
     handler = RotatingFileHandler(filename=join(this_dir, 'logs/tea.log'), encoding='utf-8', mode='w', maxBytes=10000,

@@ -1,13 +1,16 @@
 import io
+import logging
 from operator import itemgetter
 
 import tabulate
 from disnake import Permissions, ApplicationCommandInteraction as Inter, File, Guild
 from disnake.ext import commands
 
-from config import BOT_CONFIG
+from config import BOT_CONFIG, LOG_NAME
 from utils.api import get_guild_members
 from utils.users import get_all_db_users
+
+logger = logging.getLogger(LOG_NAME)
 
 
 class RosterReports(commands.Cog):
@@ -18,6 +21,7 @@ class RosterReports(commands.Cog):
                             default_member_permissions=Permissions(moderate_members=True), dm_permission=False)
     async def generate_in_game_roster(self, inter: Inter):
         await inter.response.defer(ephemeral=True, with_message=True)
+        logger.info(f"{inter.user.display_name} [{inter.user.id}] requested in-game guild roster")
 
         members = get_guild_members()
         if not members:
@@ -33,6 +37,7 @@ class RosterReports(commands.Cog):
                             default_member_permissions=Permissions(moderate_members=True), dm_permission=False)
     async def generate_roster(self, inter: Inter):
         await inter.response.defer(ephemeral=True, with_message=True)
+        logger.info(f"{inter.user.display_name} [{inter.user.id}] requested combined roster")
 
         server: Guild = self.bot.get_guild(BOT_CONFIG['SERVER'])
         server_members = server.members

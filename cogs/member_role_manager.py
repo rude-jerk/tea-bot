@@ -6,13 +6,13 @@ from disnake.errors import Forbidden
 from disnake.ext import commands, tasks
 from disnake.ext.commands import Bot
 
-from config import BOT_MESSAGES, BOT_CONFIG, GUILD
+from config import BOT_MESSAGES, BOT_CONFIG, GUILD, LOG_NAME
 from interface.views.visitor_view import VisitorView
 from utils.api import get_guild_member, get_account_details, get_guild_members
 from utils.channel_logger import send_log
 from utils.users import *
 
-logger = logging.getLogger('tea_discord')
+logger = logging.getLogger(LOG_NAME)
 
 hierarchy = GUILD['ROLES']['HIERARCHY']
 

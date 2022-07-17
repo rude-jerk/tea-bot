@@ -4,6 +4,8 @@ import yaml
 
 this_dir = dirname(__file__)
 
+LOG_NAME = 'tea_discord'
+
 with open(join(this_dir, 'configs/bot.yaml'), 'r') as f:
     BOT_CONFIG = yaml.safe_load(f)
 

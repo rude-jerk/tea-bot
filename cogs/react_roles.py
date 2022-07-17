@@ -3,10 +3,10 @@ import logging
 from disnake.ext import commands
 from disnake.ext.commands import Context, Bot
 
-from config import BOT_MESSAGES, BOT_CONFIG
+from config import BOT_MESSAGES, BOT_CONFIG, LOG_NAME
 from interface.views.role_view import ReactRoleView
 
-logger = logging.getLogger('tea_discord')
+logger = logging.getLogger(LOG_NAME)
 
 
 def owner_check(ctx: Context):

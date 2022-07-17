@@ -3,9 +3,9 @@ import logging
 import requests
 from cachetools import TTLCache, cached
 
-from config import GUILD, API_ENDPOINTS, BOT_CONFIG, BOT_MESSAGES
+from config import GUILD, API_ENDPOINTS, BOT_CONFIG, BOT_MESSAGES, LOG_NAME
 
-logger = logging.getLogger('tea_discord')
+logger = logging.getLogger(LOG_NAME)
 
 
 def _build_headers(key):

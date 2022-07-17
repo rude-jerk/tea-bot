@@ -2,9 +2,9 @@ import logging
 
 from disnake import Guild
 
-from config import BOT_CONFIG
+from config import BOT_CONFIG, LOG_NAME
 
-logger = logging.getLogger('tea_discord')
+logger = logging.getLogger(LOG_NAME)
 
 
 async def send_log(server: Guild, message: str, severity: str = 'INFO'):
