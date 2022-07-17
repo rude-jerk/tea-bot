@@ -1,7 +1,11 @@
+import logging
+
 import requests
 from cachetools import TTLCache, cached
 
 from config import GUILD, API_ENDPOINTS, BOT_CONFIG, BOT_MESSAGES
+
+logger = logging.getLogger('tea_discord')
 
 
 def _build_headers(key):
@@ -12,6 +16,7 @@ def _build_headers(key):
 def get_guild_members():
     r = requests.get(API_ENDPOINTS['GW2_GUILD_MEMBERS'].format(guild_id=GUILD['GW2_GUILD_ID']),
                      headers=_build_headers(BOT_CONFIG['LEADER_KEY']))
+    logger.info(f"Retrieved {len(r.json())} guild members from the GW2 API")
     return r.json()
 
 
