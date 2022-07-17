@@ -30,7 +30,7 @@ db_session = Session(db_engine)
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user.name}#{bot.user.discriminator} [{bot.user.id}]')
+    logger.info(f'Logged in as {bot.user.name}#{bot.user.discriminator} [{bot.user.id}]')
 
 
 if __name__ == '__main__':

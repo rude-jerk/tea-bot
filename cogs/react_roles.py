@@ -23,7 +23,7 @@ class ReactRoles(commands.Cog):
         if not self.persistent_view_added:
             self.bot.add_view(ReactRoleView(self.bot))
             self.persistent_view_added = True
-            logger.info("Associated ReactRole view")
+            logger.debug("Associated ReactRole view")
 
     @commands.command(name="react_roles")
     @commands.check(owner_check)

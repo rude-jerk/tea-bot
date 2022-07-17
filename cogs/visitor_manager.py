@@ -44,7 +44,7 @@ class VisitorManager(commands.Cog):
         visitor_id = GUILD['ROLES']['VISITOR']
         if visitor_id not in before_roles and visitor_id in after_roles:
             create_visitor(after.id)
-            logger.info(f"Created visitor DB record for {after.display_name} [{after.id}]")
+            logger.debug(f"Created visitor DB record for {after.display_name} [{after.id}]")
 
     @commands.Cog.listener()
     async def on_ready(self):
