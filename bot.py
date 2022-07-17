@@ -1,6 +1,6 @@
-from os.path import dirname, join
 import logging
 from logging.handlers import RotatingFileHandler
+from os.path import dirname, join
 
 from disnake import Intents
 from disnake.ext import commands
@@ -9,14 +9,15 @@ from sqlalchemy.orm import Session, declarative_base
 
 from config import BOT_CONFIG
 
-logger = logging.getLogger('tea_discord')
-logger.setLevel(logging.DEBUG)
-handler = RotatingFileHandler(filename='tea.log', encoding='utf-8', mode='w', maxBytes=10000, backupCount=10)
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-logger.addHandler(handler)
-
 intents = Intents.all()
 this_dir = dirname(__file__)
+
+logger = logging.getLogger('tea_discord')
+logger.setLevel(logging.DEBUG)
+handler = RotatingFileHandler(filename=join(this_dir, 'logs/tea.log'), encoding='utf-8', mode='w', maxBytes=10000,
+                              backupCount=10)
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 
 bot = commands.Bot(description="Tyrian Education Association Discord Bot", command_prefix='!', sync_commands_debug=True,
                    intents=intents)
