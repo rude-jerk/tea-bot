@@ -296,6 +296,8 @@ class MemberRoleManager(commands.Cog):
 
                 member_role_ids = [role.id for role in discord_member.roles]
                 guild_rank = guild_member.get('rank')
+                if guild_rank == 'invited':
+                    continue
                 if not db_member.get('gw2_api_key') and guild_rank:
                     guild_rank = 'FRESHMAN'
 
