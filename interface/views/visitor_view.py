@@ -28,7 +28,7 @@ class VisitorView(View):
         member = server.get_member(inter.user.id)
         visitor_role = server.get_role(GUILD['ROLES']['VISITOR'])
 
-        logger.log(logging.INFO, f"{inter.user.display_name} [{inter.user.id}] clicked just visiting")
+        logger.info(f"{inter.user.display_name} [{inter.user.id}] clicked just visiting")
         await member.add_roles(visitor_role, reason="Just visiting")
         await inter.followup.send(BOT_MESSAGES['JUST_VISITING_CLICK'])
         await send_log(server, f"{member.mention} is now just visiting!")

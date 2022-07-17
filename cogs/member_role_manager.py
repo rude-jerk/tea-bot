@@ -36,10 +36,10 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
             await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
             await discord_member.remove_roles(server.get_role(GUILD['ROLES']['VISITOR']))
             remove_visitor(str(discord_member.id))
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(e, exc_info=True)
         for role in roles:
-            logger.log(logging.INFO, f"Adding {role.name} to {discord_member.display_name} [{discord_member.id}]")
+            logger.info(f"Adding {role.name} to {discord_member.display_name} [{discord_member.id}]")
             await discord_member.add_roles(role, reason=f"{'[AUTO]' if auto else ''}[API Key] Guild Role: {role_name}")
 
     return given_roles
@@ -50,9 +50,9 @@ async def _add_minimum_guild_rank(server: Guild, discord_member: Member, guild_r
         await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
         await discord_member.remove_roles(server.get_role(GUILD['ROLES']['VISITOR']))
         remove_visitor(str(discord_member.id))
-    except Exception:
-        pass
-    logger.log(logging.INFO, f"Adding Freshman to {discord_member.display_name} [{discord_member.id}]")
+    except Exception as e:
+        logger.error(e, exc_info=True)
+    logger.info(f"Adding Freshman to {discord_member.display_name} [{discord_member.id}]")
     await discord_member.add_roles(server.get_role(GUILD['ROLES']['FRESHMAN']),
                                    reason=f"{'[AUTO] ' if auto else ''}Guild Role: {guild_rank}")
 
@@ -80,7 +80,7 @@ async def _set_nick_name(member: Member, user_name: str):
         if new_nick:
             if len(new_nick) >= 32:
                 return False
-            logger.log(logging.INFO, f"Updating {member.display_name} [{member.id}] nickname to {new_nick}")
+            logger.info(f"Updating {member.display_name} [{member.id}] nickname to {new_nick}")
             await member.edit(nick=new_nick)
         return True
     except Forbidden:
@@ -93,8 +93,8 @@ async def _remove_all_roles(member: Member):
             continue
         try:
             await member.remove_roles(role)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(e, exc_info=True)
 
 
 class MemberRoleManager(commands.Cog):
@@ -122,8 +122,8 @@ class MemberRoleManager(commands.Cog):
                 try:
                     false_member = server.get_member(int(db_user.discord_id))
                     await _remove_all_roles(false_member)
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.error(e, exc_info=True)
 
                 await send_log(server, f"User {user.mention} registered as `{gw2_account}` "
                                        f"with an API key which was already linked to <@{db_user.discord_id}>. "
@@ -173,30 +173,30 @@ class MemberRoleManager(commands.Cog):
             try:
                 await message.reply(BOT_MESSAGES['NOT_COMMAND'], delete_after=60)
             except Forbidden:
-                logger.log(logging.INFO, f"Unable to reply to message [{message.content}] from "
-                                         f"[{message.author.display_name}] in [{message.channel.name}]")
+                logger.info(f"Unable to reply to message [{message.content}] from "
+                            f"[{message.author.display_name}] in [{message.channel.name}]")
 
     @commands.Cog.listener()
     async def on_member_join(self, member: Member):
         try:
-            logger.log(logging.INFO, f"Welcome message send to {member.display_name} [{member.id}]")
+            logger.info(f"Welcome message send to {member.display_name} [{member.id}]")
             await member.send(BOT_MESSAGES['WELCOME_MESSAGE'], view=VisitorView(self.bot, member.id))
         except Forbidden:
             welcome_channel = self.bot.get_channel(BOT_CONFIG['WELCOME_CHANNEL'])
-            logger.log(logging.INFO,
-                       f"Welcome message send to {member.display_name} [{member.id}] in {welcome_channel.name}")
+            logger.info(f"Welcome message send to {member.display_name} [{member.id}] in {welcome_channel.name}")
             await welcome_channel.send(f"{member.mention} " + BOT_MESSAGES['WELCOME_MESSAGE'],
                                        view=VisitorView(self.bot, member.id), delete_after=300)
 
     @commands.slash_command(name='twelcome', description="Resends the welcome message", dm_permission=True)
     async def welcome(self, inter: Inter):
         await inter.response.defer(ephemeral=True, with_message=True)
-        logger.log(logging.INFO, f"/twelcome from {inter.user.display_name} [{inter.user.id}]")
+        logger.info(f"/twelcome from {inter.user.display_name} [{inter.user.id}]")
 
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
         try:
             member = server.get_member(inter.user.id)
-        except Exception:
+        except Exception as e:
+            logger.error(e, exc_info=True)
             await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
             return
         if inter.guild_id:
@@ -207,8 +207,8 @@ class MemberRoleManager(commands.Cog):
     async def admin_welcome(self, inter: Inter, member: Member,
                             default_member_permissions=Permissions(moderate_members=True), dm_permission=False):
         await inter.response.defer(ephemeral=True, with_message=True)
-        logger.log(logging.INFO, f"/twelcome_push for {member.display_name} [{member.id}] from "
-                                 f"{inter.user.display_name} [{inter.user.id}]")
+        logger.info(f"/twelcome_push for {member.display_name} [{member.id}] from "
+                    f"{inter.user.display_name} [{inter.user.id}]")
         await self.on_member_join(member)
         await inter.followup.send(f'Welcome message sent to {member.mention}')
 
@@ -217,12 +217,13 @@ class MemberRoleManager(commands.Cog):
                                                                                description="Your GW2 Account username"
                                                                                            " ex: abcd.1234")):
         await inter.response.defer(ephemeral=True, with_message=True)
-        logger.log(logging.INFO, f"/tjoin from {inter.user.display_name} [{inter.user.id}]")
+        logger.info(f"/tjoin from {inter.user.display_name} [{inter.user.id}]")
 
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
         try:
             member = server.get_member(inter.user.id)
-        except Exception:
+        except Exception as e:
+            logger.error(e, exc_info=True)
             await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
             return
 
@@ -235,12 +236,13 @@ class MemberRoleManager(commands.Cog):
     async def register_discord(self, inter: Inter, api_key: str = commands.Param(name="api_key",
                                                                                  description="Your GW2 API Key")):
         await inter.response.defer(ephemeral=True, with_message=True)
-        logger.log(logging.INFO, f"/tregister from {inter.user.display_name} [{inter.user.id}]")
+        logger.info(f"/tregister from {inter.user.display_name} [{inter.user.id}]")
 
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
         try:
             member = server.get_member(inter.user.id)
-        except Exception:
+        except Exception as e:
+            logger.error(e, exc_info=True)
             await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
             return
 
@@ -251,8 +253,8 @@ class MemberRoleManager(commands.Cog):
                             default_member_permissions=Permissions(moderate_members=True), dm_permission=False)
     async def admin_link(self, inter: Inter, member: Member, gw2_account: str):
         await inter.response.defer(ephemeral=True, with_message=True)
-        logger.log(logging.INFO, f"/tlink for {member.display_name} [{member.id}] from "
-                                 f"{inter.user.display_name} [{inter.user.id}]")
+        logger.info(f"/tlink for {member.display_name} [{member.id}] from "
+                    f"{inter.user.display_name} [{inter.user.id}]")
 
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
@@ -263,8 +265,8 @@ class MemberRoleManager(commands.Cog):
                             default_member_permissions=Permissions(moderate_members=True), dm_permission=False)
     async def admin_unlink(self, inter: Inter, member: Member):
         await inter.response.defer(ephemeral=True, with_message=True)
-        logger.log(logging.INFO, f"/tunlink for {member.display_name} [{member.id}] from "
-                                 f"{inter.user.display_name} [{inter.user.id}]")
+        logger.info(f"/tunlink for {member.display_name} [{member.id}] from "
+                    f"{inter.user.display_name} [{inter.user.id}]")
 
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
@@ -275,7 +277,7 @@ class MemberRoleManager(commands.Cog):
 
     @tasks.loop(hours=8)
     async def auto_update_roles(self):
-        logger.log(logging.INFO, 'Auto update roles starting')
+        logger.info('[AUTO] Guild role polling started')
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
         discord_members = server.members
@@ -312,17 +314,19 @@ class MemberRoleManager(commands.Cog):
                     if discord_rank not in member_role_ids:
                         try:
                             if discord_rank == GUILD['ROLES']['FRESHMAN']:
-                                logger.log(logging.INFO, f"Auto-adding minimum guild role to "
-                                                         f"{discord_member.display_name} [{discord_member.id}]")
+                                logger.info(f"Auto-adding minimum guild role to "
+                                            f"{discord_member.display_name} [{discord_member.id}]")
                                 await _add_minimum_guild_rank(server, discord_member, guild_member.get('rank').upper(),
                                                               auto=True)
                             else:
-                                logger.log(logging.INFO, f"Auto-adding {guild_rank} to "
-                                                         f"{discord_member.display_name} [{discord_member.id}]")
+                                logger.info(f"Auto-adding {guild_rank} to "
+                                            f"{discord_member.display_name} [{discord_member.id}]")
                                 await _add_roles_by_guild_rank(server, discord_member, guild_rank.upper(), auto=True)
                             await send_log(server, f"Auto updated {discord_member.mention} to `{guild_rank.upper()}`")
-                        except Exception:
-                            pass
+                        except Exception as e:
+                            logger.error(e, exc_info=True)
+
+        logger.info("[AUTO] Guild role polling completed")
 
     @commands.Cog.listener()
     async def on_ready(self):
