@@ -40,5 +40,9 @@ class VisitorView(View):
 
         logger.info(f"{inter.user.display_name} [{inter.user.id}] clicked just visiting")
         await member.add_roles(visitor_role, reason="Just visiting")
+
+        self.children[0].disabled = True
+        await self.message.edit(view=self)
+
         await inter.followup.send(BOT_MESSAGES['JUST_VISITING_CLICK'])
         await send_log(server, f"{member.mention} is now just visiting!")
