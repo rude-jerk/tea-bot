@@ -39,6 +39,7 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
         except Exception:
             pass
         for role in roles:
+            logger.log(logging.INFO, f"Adding {role.name} to {discord_member.display_name} [{discord_member.id}]")
             await discord_member.add_roles(role, reason=f"{'[AUTO]' if auto else ''}[API Key] Guild Role: {role_name}")
 
     return given_roles
@@ -51,6 +52,7 @@ async def _add_minimum_guild_rank(server: Guild, discord_member: Member, guild_r
         remove_visitor(str(discord_member.id))
     except Exception:
         pass
+    logger.log(logging.INFO, f"Adding Freshman to {discord_member.display_name} [{discord_member.id}]")
     await discord_member.add_roles(server.get_role(GUILD['ROLES']['FRESHMAN']),
                                    reason=f"{'[AUTO] ' if auto else ''}Guild Role: {guild_rank}")
 
@@ -78,8 +80,8 @@ async def _set_nick_name(member: Member, user_name: str):
         if new_nick:
             if len(new_nick) >= 32:
                 return False
+            logger.log(logging.INFO, f"Updating {member.display_name} [{member.id}] nickname to {new_nick}")
             await member.edit(nick=new_nick)
-            logger.log(logging.INFO, f"{member.display_name} [{member.id}] nickname updated to {new_nick}")
         return True
     except Forbidden:
         return False
@@ -316,7 +318,7 @@ class MemberRoleManager(commands.Cog):
                                 logger.log(logging.INFO, f"Auto-adding {guild_rank} to "
                                                          f"{discord_member.display_name} [{discord_member.id}]")
                                 await _add_roles_by_guild_rank(server, discord_member, guild_rank.upper(), auto=True)
-                            await send_log(server, f"Auto updated {discord_member.mention} to `{guild_rank}`")
+                            await send_log(server, f"Auto updated {discord_member.mention} to `{guild_rank.upper()}`")
                         except Exception:
                             pass
 
