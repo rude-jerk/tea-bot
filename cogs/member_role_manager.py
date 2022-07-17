@@ -273,7 +273,7 @@ class MemberRoleManager(commands.Cog):
 
     @tasks.loop(hours=8)
     async def auto_update_roles(self):
-        logger.log(logging.INFO, 'Auto update roles stating')
+        logger.log(logging.INFO, 'Auto update roles starting')
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
         discord_members = server.members

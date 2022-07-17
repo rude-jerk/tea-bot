@@ -14,10 +14,11 @@ this_dir = dirname(__file__)
 
 logger = logging.getLogger('tea_discord')
 logger.setLevel(logging.DEBUG)
-handler = RotatingFileHandler(filename=join(this_dir, 'logs/tea.log'), encoding='utf-8', mode='w', maxBytes=10000,
-                              backupCount=10)
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-logger.addHandler(handler)
+if not len(logger.handlers):
+    handler = RotatingFileHandler(filename=join(this_dir, 'logs/tea.log'), encoding='utf-8', mode='w', maxBytes=10000,
+                                  backupCount=10)
+    handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    logger.addHandler(handler)
 
 bot = commands.Bot(description="Tyrian Education Association Discord Bot", command_prefix='!', sync_commands_debug=True,
                    intents=intents)
