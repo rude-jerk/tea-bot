@@ -5,3 +5,4 @@ guild_members.db
 venv
 .env
 *.pyc
+*.log*

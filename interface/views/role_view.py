@@ -1,12 +1,13 @@
-from disnake import ButtonStyle, MessageInteraction, Guild, Member
+import logging
+from enum import Enum
+
+from disnake import ButtonStyle, MessageInteraction, Guild
 from disnake.ext.commands import Bot
 from disnake.ui import View, button, Button
 
 from config import BOT_CONFIG, GUILD, BOT_MESSAGES
-from utils.channel_logger import send_log
-from utils.users import create_visitor
 
-from enum import Enum
+logger = logging.getLogger('tea_discord')
 
 
 class ReactRoleResponse(Enum):
@@ -27,9 +28,11 @@ class ReactRoleView(View):
             role = server.get_role(role_id)
             if role in member.roles:
                 await member.remove_roles(role)
+                logger.log(logging.INFO, f"Removed role {role.name} from {member.display_name} [{member.id}]")
                 return ReactRoleResponse.REMOVED_ROLE
             else:
                 await member.add_roles(role)
+                logger.log(logging.INFO, f"Added role {role.name} to {member.display_name} [{member.id}]")
                 return ReactRoleResponse.ADDED_ROLE
         except Exception:
             return ReactRoleResponse.ERROR
@@ -49,12 +52,15 @@ class ReactRoleView(View):
 
     @button(label="Raids", style=ButtonStyle.red, custom_id='btn_tea_RAID')
     async def get_raid_role(self, this_button: Button, inter: MessageInteraction):
+        logger.log(logging.INFO, f"{inter.user.display_name} [{inter.user.id}] clicked react role RAID")
         await self.handle_click(inter, 'RAIDS')
 
     @button(label='Fractals', style=ButtonStyle.blurple, custom_id='btn_tea_FRACTAL')
     async def get_fractal_role(self, this_button: Button, inter: MessageInteraction):
+        logger.log(logging.INFO, f"{inter.user.display_name} [{inter.user.id}] clicked react role FRACTAL")
         await self.handle_click(inter, 'FRACTALS')
 
     @button(label='Strikes', style=ButtonStyle.green, custom_id='btn_tea_STRIKE')
     async def get_strike_role(self, this_button: Button, inter: MessageInteraction):
+        logger.log(logging.INFO, f"{inter.user.display_name} [{inter.user.id}] clicked react role STRIKE")
         await self.handle_click(inter, 'STRIKES')

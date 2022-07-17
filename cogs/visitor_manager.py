@@ -1,9 +1,13 @@
 from disnake.ext import commands, tasks
 from disnake.ext.commands import Bot
+from disnake import Member
 
 from config import BOT_CONFIG, GUILD, BOT_MESSAGES
 from utils.channel_logger import send_log
-from utils.users import get_expired_visitors, get_all_visitors, remove_visitor
+from utils.users import get_expired_visitors, get_all_visitors, remove_visitor, create_visitor
+import logging
+
+logger = logging.getLogger('tea_discord')
 
 
 class VisitorManager(commands.Cog):
@@ -12,6 +16,7 @@ class VisitorManager(commands.Cog):
 
     @tasks.loop(hours=1)
     async def remove_expired_visitors(self):
+        logger.log(logging.INFO, 'Expired visitor removal starting')
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
         expired_visitors = get_expired_visitors()
@@ -25,9 +30,19 @@ class VisitorManager(commands.Cog):
                     await role_visitor.remove_roles(visitor_role)
                     await send_log(server, f"Visitor role removed from {role_visitor.mention}")
                     remove_visitor(str(role_visitor.id))
+                    logger.log(logging.INFO, f'Visitor role removed from {role_visitor.display_name} [{role_visitor.id}]')
                     await role_visitor.send(BOT_MESSAGES['VISITOR_EXPIRED'])
                 except Exception:
                     pass
+
+    @commands.Cog.listener()
+    async def on_member_update(self, before: Member, after: Member):
+        before_roles = [role.id for role in before.roles]
+        after_roles = [role.id for role in after.roles]
+        visitor_id = GUILD['ROLES']['VISITOR']
+        if visitor_id not in before_roles and visitor_id in after_roles:
+            create_visitor(after.id)
+            logger.log(logging.INFO, f"Created visitor DB record for {after.display_name} [{after.id}]")
 
     @commands.Cog.listener()
     async def on_ready(self):

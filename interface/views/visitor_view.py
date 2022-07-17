@@ -1,10 +1,13 @@
+import logging
+
 from disnake import ButtonStyle, MessageInteraction
 from disnake.ext.commands import Bot
 from disnake.ui import View, button, Button
 
 from config import BOT_CONFIG, GUILD, BOT_MESSAGES
 from utils.channel_logger import send_log
-from utils.users import create_visitor
+
+logger = logging.getLogger('tea_discord')
 
 
 class VisitorView(View):
@@ -25,7 +28,7 @@ class VisitorView(View):
         member = server.get_member(inter.user.id)
         visitor_role = server.get_role(GUILD['ROLES']['VISITOR'])
 
-        create_visitor(inter.user.id)
+        logger.log(logging.INFO, f"{inter.user.display_name} [{inter.user.id}] clicked just visiting")
         await member.add_roles(visitor_role, reason="Just visiting")
         await inter.followup.send(BOT_MESSAGES['JUST_VISITING_CLICK'])
         await send_log(server, f"{member.mention} is now just visiting!")

@@ -1,4 +1,6 @@
 from os.path import dirname, join
+import logging
+from logging.handlers import RotatingFileHandler
 
 from disnake import Intents
 from disnake.ext import commands
@@ -6,6 +8,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, declarative_base
 
 from config import BOT_CONFIG
+
+logger = logging.getLogger('tea_discord')
+logger.setLevel(logging.DEBUG)
+handler = RotatingFileHandler(filename='tea.log', encoding='utf-8', mode='w', maxBytes=10000, backupCount=10)
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 
 intents = Intents.all()
 this_dir = dirname(__file__)
