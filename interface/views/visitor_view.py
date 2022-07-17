@@ -1,5 +1,6 @@
 import logging
 
+import disnake
 from disnake import ButtonStyle, MessageInteraction
 from disnake.ext.commands import Bot
 from disnake.ui import View, button, Button
@@ -11,10 +12,19 @@ logger = logging.getLogger(LOG_NAME)
 
 
 class VisitorView(View):
+    message: disnake.Message
+
     def __init__(self, bot: Bot, user_id: int):
         self.bot = bot
         self.user_id = user_id
         super().__init__(timeout=5 * 60)
+
+    async def on_timeout(self) -> None:
+        try:
+            self.children[0].disabled = True
+            await self.message.edit(view=self)
+        except Exception:
+            pass
 
     @button(label="I'm just visiting!", style=ButtonStyle.blurple)
     async def get_visitor_role(self, this_button: Button, inter: MessageInteraction):

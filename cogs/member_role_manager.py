@@ -188,14 +188,15 @@ class MemberRoleManager(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: Member):
+        view = VisitorView(self.bot, member.id)
         try:
-            logger.info(f"Welcome message send to {member.display_name} [{member.id}]")
-            await member.send(BOT_MESSAGES['WELCOME_MESSAGE'], view=VisitorView(self.bot, member.id))
+            view.message = await member.send(BOT_MESSAGES['WELCOME_MESSAGE'], view=view)
+            logger.info(f"Welcome message sent to {member.display_name} [{member.id}]")
         except Forbidden:
             welcome_channel = self.bot.get_channel(BOT_CONFIG['WELCOME_CHANNEL'])
+            view.message = await welcome_channel.send(f"{member.mention} {BOT_MESSAGES['WELCOME_MESSAGE']}", view=view,
+                                                      delete_after=5 * 60)
             logger.info(f"Welcome message send to {member.display_name} [{member.id}] in {welcome_channel.name}")
-            await welcome_channel.send(f"{member.mention} " + BOT_MESSAGES['WELCOME_MESSAGE'],
-                                       view=VisitorView(self.bot, member.id), delete_after=300)
 
     @commands.slash_command(name='twelcome', description="Resends the welcome message", dm_permission=True)
     async def welcome(self, inter: Inter):
@@ -203,14 +204,13 @@ class MemberRoleManager(commands.Cog):
         logger.info(f"/twelcome from {inter.user.display_name} [{inter.user.id}]")
 
         try:
-            server, member = self.get_server_and_member(inter.user.id)
+            server, member = await self.get_server_and_member(inter.user.id)
         except Exception as e:
             logger.error(e, exc_info=True)
             await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
             return
 
-        if inter.guild_id:
-            await inter.followup.send(BOT_MESSAGES['CHECK_DMS'])
+        await inter.followup.send(BOT_MESSAGES['CHECK_DMS'])
         await self.on_member_join(member)
 
     @commands.slash_command(name='twelcome_push', description="Force resend the welcome message to a member")
@@ -230,7 +230,7 @@ class MemberRoleManager(commands.Cog):
         logger.info(f"/tjoin from {inter.user.display_name} [{inter.user.id}]")
 
         try:
-            server, member = self.get_server_and_member(inter.user.id)
+            server, member = await self.get_server_and_member(inter.user.id)
         except Exception as e:
             logger.error(e, exc_info=True)
             await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
@@ -248,7 +248,7 @@ class MemberRoleManager(commands.Cog):
         logger.info(f"/tregister from {inter.user.display_name} [{inter.user.id}]")
 
         try:
-            server, member = self.get_server_and_member(inter.user.id)
+            server, member = await self.get_server_and_member(inter.user.id)
         except Exception as e:
             logger.error(e, exc_info=True)
             await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
