@@ -1,6 +1,7 @@
 import logging
+from typing import List
 
-from disnake import Member, ApplicationCommandInteraction as Inter, Guild, Message, Permissions, User
+from disnake import Member, ApplicationCommandInteraction as Inter, Guild, Message, Permissions, User, Role
 from disnake.errors import Forbidden
 from disnake.ext import commands, tasks
 from disnake.ext.commands import Bot
@@ -14,6 +15,12 @@ from utils.users import *
 logger = logging.getLogger('tea_discord')
 
 hierarchy = GUILD['ROLES']['HIERARCHY']
+
+
+async def _remove_low_roles(member: Member, roles: List[Role]):
+    for role in roles:
+        await member.remove_roles(role)
+    remove_visitor(member.id)
 
 
 async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_name: str, auto: bool = False):
@@ -33,9 +40,8 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
     roles = [server.get_role(role) for role in role_list]
     if len(roles) > 0:
         try:
-            await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
-            await discord_member.remove_roles(server.get_role(GUILD['ROLES']['VISITOR']))
-            remove_visitor(str(discord_member.id))
+            await _remove_low_roles(discord_member, [server.get_role(GUILD['ROLES']['NONMEMBER']),
+                                                     server.get_role(GUILD['ROLES']['VISITOR'])])
         except Exception as e:
             logger.error(e, exc_info=True)
         for role in roles:
@@ -47,9 +53,8 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
 
 async def _add_minimum_guild_rank(server: Guild, discord_member: Member, guild_rank: str, auto: bool = False):
     try:
-        await discord_member.remove_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
-        await discord_member.remove_roles(server.get_role(GUILD['ROLES']['VISITOR']))
-        remove_visitor(str(discord_member.id))
+        await _remove_low_roles(discord_member, [server.get_role(GUILD['ROLES']['NONMEMBER']),
+                                                 server.get_role(GUILD['ROLES']['VISITOR'])])
     except Exception as e:
         logger.error(e, exc_info=True)
     logger.info(f"Adding Freshman to {discord_member.display_name} [{discord_member.id}]")
@@ -167,6 +172,11 @@ class MemberRoleManager(commands.Cog):
                                                               given_roles=given_roles) + \
                        f" {BOT_MESSAGES['USER_NAME_SET'] if user_name_set else BOT_MESSAGES['USER_NAME_UNSET']}"
 
+    async def get_server_and_member(self, member_id: int):
+        server = self.bot.get_guild(BOT_CONFIG['SERVER'])
+        member = server.get_member(member_id)
+        return server, member
+
     @commands.Cog.listener()
     async def on_message(self, message: Message):
         if message.content.startswith('/tjoin') or message.content.startswith('/tregister'):
@@ -192,13 +202,13 @@ class MemberRoleManager(commands.Cog):
         await inter.response.defer(ephemeral=True, with_message=True)
         logger.info(f"/twelcome from {inter.user.display_name} [{inter.user.id}]")
 
-        server = self.bot.get_guild(BOT_CONFIG['SERVER'])
         try:
-            member = server.get_member(inter.user.id)
+            server, member = self.get_server_and_member(inter.user.id)
         except Exception as e:
             logger.error(e, exc_info=True)
             await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
             return
+
         if inter.guild_id:
             await inter.followup.send(BOT_MESSAGES['CHECK_DMS'])
         await self.on_member_join(member)
@@ -219,9 +229,8 @@ class MemberRoleManager(commands.Cog):
         await inter.response.defer(ephemeral=True, with_message=True)
         logger.info(f"/tjoin from {inter.user.display_name} [{inter.user.id}]")
 
-        server = self.bot.get_guild(BOT_CONFIG['SERVER'])
         try:
-            member = server.get_member(inter.user.id)
+            server, member = self.get_server_and_member(inter.user.id)
         except Exception as e:
             logger.error(e, exc_info=True)
             await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
@@ -238,9 +247,8 @@ class MemberRoleManager(commands.Cog):
         await inter.response.defer(ephemeral=True, with_message=True)
         logger.info(f"/tregister from {inter.user.display_name} [{inter.user.id}]")
 
-        server = self.bot.get_guild(BOT_CONFIG['SERVER'])
         try:
-            member = server.get_member(inter.user.id)
+            server, member = self.get_server_and_member(inter.user.id)
         except Exception as e:
             logger.error(e, exc_info=True)
             await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
