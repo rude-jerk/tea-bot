@@ -283,9 +283,9 @@ class MemberRoleManager(commands.Cog):
         await send_log(server, f"{member.mention} unlinked by {inter.user.mention} and has had all roles removed.")
         await inter.followup.send(BOT_MESSAGES['ROLES_REMOVED'])
 
-    @tasks.loop(hours=8)
+    @tasks.loop(hours=4)
     async def auto_update_roles(self):
-        logger.info('[AUTO] Guild role polling started')
+        logger.info('[AUTO ROLES] Guild role polling started')
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
         discord_members = server.members
@@ -322,19 +322,19 @@ class MemberRoleManager(commands.Cog):
                     if discord_rank not in member_role_ids:
                         try:
                             if discord_rank == GUILD['ROLES']['FRESHMAN']:
-                                logger.info(f"Auto-adding minimum guild role to "
+                                logger.info(f"[AUTO ROLES] Adding minimum guild role to "
                                             f"{discord_member.display_name} [{discord_member.id}]")
                                 await _add_minimum_guild_rank(server, discord_member, guild_member.get('rank').upper(),
                                                               auto=True)
                             else:
-                                logger.info(f"Auto-adding {guild_rank} to "
+                                logger.info(f"[AUTO ROLES] Adding {guild_rank} to "
                                             f"{discord_member.display_name} [{discord_member.id}]")
                                 await _add_roles_by_guild_rank(server, discord_member, guild_rank.upper(), auto=True)
                             await send_log(server, f"Auto updated {discord_member.mention} to `{guild_rank.upper()}`")
                         except Exception as e:
                             logger.error(e, exc_info=True)
 
-        logger.info("[AUTO] Guild role polling completed")
+        logger.info("[AUTO ROLES] Guild role polling completed")
 
     @commands.Cog.listener()
     async def on_ready(self):

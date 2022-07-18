@@ -17,7 +17,7 @@ class VisitorManager(commands.Cog):
 
     @tasks.loop(hours=1)
     async def remove_expired_visitors(self):
-        logger.info("[AUTO] Expired visitor removal starting")
+        logger.info("[EXPIRED VISITORS] Expired visitor removal starting")
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
         expired_visitors = get_expired_visitors()
@@ -29,13 +29,14 @@ class VisitorManager(commands.Cog):
             if str(role_visitor.id) in expired_visitors or str(role_visitor.id) not in all_visitors:
                 try:
                     await role_visitor.remove_roles(visitor_role)
-                    await send_log(server, f"Visitor role removed from {role_visitor.mention}")
+                    await send_log(server, f"[EXPIRED VISITORS] Visitor role removed from {role_visitor.mention}")
                     remove_visitor(str(role_visitor.id))
-                    logger.info(f'Visitor role removed from {role_visitor.display_name} [{role_visitor.id}]')
+                    logger.info(f'[EXPIRED VISITORS] Visitor role removed from '
+                                f'{role_visitor.display_name} [{role_visitor.id}]')
                     await role_visitor.send(BOT_MESSAGES['VISITOR_EXPIRED'])
                 except Exception as e:
                     logger.error(e, exc_info=True)
-        logger.info("[AUTO] Expired visitor removal completed")
+        logger.info("[EXPIRED VISITORS] Expired visitor removal completed")
 
     @commands.Cog.listener()
     async def on_member_update(self, before: Member, after: Member):
