@@ -53,6 +53,7 @@ class VisitorManager(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: Member):
+        logger.info(f"{member.display_name} [{member.id}] left the server. Deleting visitor record if it exists.")
         remove_visitor(member.id)
 
 
