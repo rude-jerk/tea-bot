@@ -51,6 +51,10 @@ class VisitorManager(commands.Cog):
     async def on_ready(self):
         self.remove_expired_visitors.start()
 
+    @commands.Cog.listener()
+    async def on_member_remove(self, member: Member):
+        remove_visitor(member.id)
+
 
 def setup(bot):
     bot.add_cog(VisitorManager(bot))
