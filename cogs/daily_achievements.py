@@ -39,7 +39,7 @@ class DailyAchievements(commands.Cog):
         if embeds:
             self.daily_embeds = embeds
 
-    @tasks.loop(seconds=70, count=3)
+    @tasks.loop(seconds=70, count=1)
     async def startup_dailies(self):
         await self.create_dailies()
 
