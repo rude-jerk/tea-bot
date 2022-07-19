@@ -45,6 +45,7 @@ class DailyAchievements(commands.Cog):
 
     @commands.slash_command(name='dailies', description="Posts today's dailies")
     async def send_dailies(self, inter: Inter):
+        logger.info(f"/dailies from {inter.user.display_name} [{inter.user.id}]")
         if self.daily_embeds:
             await inter.response.send_message(embeds=self.daily_embeds)
         else:
