@@ -1,6 +1,7 @@
 import logging
 import re
 
+import aiohttp
 import requests
 from cachetools import TTLCache, cached
 
@@ -39,32 +40,35 @@ def get_account_details(api_key: str):
         return False, BOT_MESSAGES['API_WENT_WRONG']
 
 
-def get_dailies():
-    r = requests.get(API_ENDPOINTS['GW2_DAILIES'])
-    dailies_payload = r.json()
-    achievement_dict = {}
+async def get_dailies():
+    async with aiohttp.ClientSession() as session:
+        async with session.get(API_ENDPOINTS['GW2_DAILIES']) as response:
+            dailies_payload = await response.json()
+        achievement_dict = {}
 
-    for daily_cat, dailies_raw in dailies_payload.items():
-        if len(dailies_raw) == 0:
-            continue
-
-        category_list = []
-        for daily in dailies_raw:
-            try:
-                r = requests.get(API_ENDPOINTS['GW2_ACHIEVEMENTS'], params={'id': daily.get('id')}).json()
-            except Exception:
+        for daily_cat, dailies_raw in dailies_payload.items():
+            if len(dailies_raw) == 0:
                 continue
 
-            ach_name = r.get('name')
-            if daily_cat == 'fractals':
-                m = re.match(r"^Daily Recommended Fractal—Scale (\d+)$", r.get('name'))
-                if m:
-                    ach_name = f"{ach_name} - {fractals[int(m.group(1))]}"
+            category_list = []
+            for daily in dailies_raw:
+                try:
+                    async with session.get(API_ENDPOINTS['GW2_ACHIEVEMENTS'],
+                                           params={'id': daily.get('id')}) as response:
+                        r = await response.json()
+                except Exception:
+                    continue
 
-            category_list.append({'name': ach_name, 'description': r.get('requirement'),
-                                  'required': r.get('tiers')[0].get('count'), 'id': r.get('id')})
+                ach_name = r.get('name')
+                if daily_cat == 'fractals':
+                    m = re.match(r"^Daily Recommended Fractal—Scale (\d+)$", r.get('name'))
+                    if m:
+                        ach_name = f"{ach_name} - {fractals[int(m.group(1))]}"
 
-        if len(category_list):
-            achievement_dict[daily_cat] = category_list
+                category_list.append({'name': ach_name, 'description': r.get('requirement'),
+                                      'required': r.get('tiers')[0].get('count'), 'id': r.get('id')})
+
+            if len(category_list):
+                achievement_dict[daily_cat] = category_list
 
     return achievement_dict

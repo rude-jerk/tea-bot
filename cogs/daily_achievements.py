@@ -17,8 +17,9 @@ class DailyAchievements(commands.Cog):
 
     @tasks.loop(time=datetime.time(hour=0, minute=3))
     async def create_dailies(self):
+        self.daily_embeds = None
         logger.info('[UPDATE DAILIES] Update dailies starting')
-        dailies = get_dailies()
+        dailies = await get_dailies()
         embeds = []
         now = datetime.datetime.now()
         for k, v in dailies.items():
@@ -38,13 +39,21 @@ class DailyAchievements(commands.Cog):
         if embeds:
             self.daily_embeds = embeds
 
+    @tasks.loop(seconds=70, count=3)
+    async def startup_dailies(self):
+        await self.create_dailies()
+
     @commands.slash_command(name='dailies', description="Posts today's dailies")
     async def send_dailies(self, inter: Inter):
-        await inter.response.send_message(embeds=self.daily_embeds)
+        if self.daily_embeds:
+            await inter.response.send_message(embeds=self.daily_embeds)
+        else:
+            await inter.response.send_message('Daily data is currently updating, try again in a minute or two!',
+                                              ephemeral=True)
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.create_dailies()
+        self.startup_dailies.start()
         self.create_dailies.start()
 
 
