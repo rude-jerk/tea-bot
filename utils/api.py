@@ -61,6 +61,9 @@ async def get_dailies():
 
             category_list = []
             for daily in dailies_raw:
+                if daily.get('level', {'max': 80}).get('max', 80) < 80:
+                    continue
+
                 try:
                     async with session.get(API_ENDPOINTS['GW2_ACHIEVEMENTS'],
                                            params={'id': daily.get('id')}) as response:
