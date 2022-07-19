@@ -1,5 +1,6 @@
 import logging
 import re
+from enum import Enum
 
 import aiohttp
 
@@ -40,6 +41,14 @@ async def get_account_details(api_key: str):
                 return False, BOT_MESSAGES['API_WENT_WRONG']
 
 
+class AchievementTypes(Enum):
+    Fractals = 'fractals'
+    PvE = "pve"
+    PvP = "pvp"
+    WvW = "wvw"
+    Strikes = "strikes"
+
+
 async def get_dailies():
     async with aiohttp.ClientSession() as session:
         async with session.get(API_ENDPOINTS['GW2_DAILIES']) as response:
@@ -66,9 +75,19 @@ async def get_dailies():
                         ach_name = f"{ach_name} - {fractals[int(m.group(1))]}"
 
                 category_list.append({'name': ach_name, 'description': r.get('requirement'),
-                                      'required': r.get('tiers')[0].get('count'), 'id': r.get('id')})
+                                      'required': r.get('tiers')[0].get('count')})
 
             if len(category_list):
                 achievement_dict[daily_cat] = category_list
+
+        async with session.get(API_ENDPOINTS['GW2_ACHIEVE_CATEGORIES'], params={'id': 250}) as response:
+            r = await response.json()
+            strike_achieve_list = [str(x) for x in r.get('achievements')]
+        async with session.get(API_ENDPOINTS['GW2_ACHIEVEMENTS'],
+                               params={'ids': ','.join(strike_achieve_list)}) as response:
+            r = await response.json()
+            achievement_dict['strikes'] = [
+                {'name': x.get('name'), 'description': x.get('requirement'), 'required': x.get('tiers')[0].get('count')}
+                for x in r]
 
     return achievement_dict
