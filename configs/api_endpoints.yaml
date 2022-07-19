@@ -1,2 +1,4 @@
 GW2_GUILD_MEMBERS: "https://api.guildwars2.com/v2/guild/{guild_id}/members"
 GW2_ACCOUNT: "https://api.guildwars2.com/v2/account"
+GW2_DAILIES: "https://api.guildwars2.com/v2/achievements/daily"
+GW2_ACHIEVEMENTS: "https://api.guildwars2.com/v2/achievements"

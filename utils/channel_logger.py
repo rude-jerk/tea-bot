@@ -8,7 +8,7 @@ logger = logging.getLogger(LOG_NAME)
 
 
 async def send_log(server: Guild, message: str, severity: str = 'INFO'):
-    logger.info(message)
+    logger.info(f"Log channel: {message}")
 
     if not BOT_CONFIG.get('LOG_CHANNEL'):
         return

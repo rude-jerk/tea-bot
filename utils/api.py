@@ -1,9 +1,11 @@
 import logging
+import re
 
 import requests
 from cachetools import TTLCache, cached
 
 from config import GUILD, API_ENDPOINTS, BOT_CONFIG, BOT_MESSAGES, LOG_NAME
+from configs.fractals import fractals
 
 logger = logging.getLogger(LOG_NAME)
 
@@ -35,3 +37,34 @@ def get_account_details(api_key: str):
         return False, BOT_MESSAGES['BAD_API_KEY']
     else:
         return False, BOT_MESSAGES['API_WENT_WRONG']
+
+
+def get_dailies():
+    r = requests.get(API_ENDPOINTS['GW2_DAILIES'])
+    dailies_payload = r.json()
+    achievement_dict = {}
+
+    for daily_cat, dailies_raw in dailies_payload.items():
+        if len(dailies_raw) == 0:
+            continue
+
+        category_list = []
+        for daily in dailies_raw:
+            try:
+                r = requests.get(API_ENDPOINTS['GW2_ACHIEVEMENTS'], params={'id': daily.get('id')}).json()
+            except Exception:
+                continue
+
+            ach_name = r.get('name')
+            if daily_cat == 'fractals':
+                m = re.match(r"^Daily Recommended Fractal—Scale (\d+)$", r.get('name'))
+                if m:
+                    ach_name = f"{ach_name} - {fractals[int(m.group(1))]}"
+
+            category_list.append({'name': ach_name, 'description': r.get('requirement'),
+                                  'required': r.get('tiers')[0].get('count'), 'id': r.get('id')})
+
+        if len(category_list):
+            achievement_dict[daily_cat] = category_list
+
+    return achievement_dict
