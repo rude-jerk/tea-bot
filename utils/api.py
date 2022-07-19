@@ -2,8 +2,6 @@ import logging
 import re
 
 import aiohttp
-import requests
-from cachetools import TTLCache, cached
 
 from config import GUILD, API_ENDPOINTS, BOT_CONFIG, BOT_MESSAGES, LOG_NAME
 from configs.fractals import fractals
@@ -15,29 +13,31 @@ def _build_headers(key):
     return {'Authorization': f'Bearer {key}'}
 
 
-@cached(TTLCache(maxsize=1, ttl=240))
-def get_guild_members():
-    r = requests.get(API_ENDPOINTS['GW2_GUILD_MEMBERS'].format(guild_id=GUILD['GW2_GUILD_ID']),
-                     headers=_build_headers(BOT_CONFIG['LEADER_KEY']))
-    logger.debug(f"Retrieved {len(r.json())} guild members from the GW2 API")
-    return r.json()
+async def get_guild_members():
+    async with aiohttp.ClientSession() as session:
+        async with session.get(API_ENDPOINTS['GW2_GUILD_MEMBERS'].format(guild_id=GUILD['GW2_GUILD_ID']),
+                               headers=_build_headers(BOT_CONFIG['LEADER_KEY'])) as r:
+            json_response = await r.json()
+    logger.debug(f"Retrieved {len(json_response)} guild members from the GW2 API")
+    return json_response
 
 
-def get_guild_member(user_name: str):
-    for member in get_guild_members():
+async def get_guild_member(user_name: str):
+    for member in await get_guild_members():
         if member.get('name') is not None and str(member.get('name')).lower() == user_name.lower():
             return member
     return False
 
 
-def get_account_details(api_key: str):
-    r = requests.get(API_ENDPOINTS['GW2_ACCOUNT'], headers=_build_headers(api_key))
-    if r.status_code == 200:
-        return True, r.json()
-    elif r.status_code in (400, 401):
-        return False, BOT_MESSAGES['BAD_API_KEY']
-    else:
-        return False, BOT_MESSAGES['API_WENT_WRONG']
+async def get_account_details(api_key: str):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(API_ENDPOINTS['GW2_ACCOUNT'], headers=_build_headers(api_key)) as r:
+            if r.status == 200:
+                return True, await r.json()
+            elif r.status in (400, 401):
+                return False, BOT_MESSAGES['BAD_API_KEY']
+            else:
+                return False, BOT_MESSAGES['API_WENT_WRONG']
 
 
 async def get_dailies():

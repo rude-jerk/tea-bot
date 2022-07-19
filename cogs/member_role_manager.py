@@ -110,7 +110,7 @@ class MemberRoleManager(commands.Cog):
     async def _handle_user_update(server: Guild, user: Member, gw2_account: str = None, api_key: str = None,
                                   admin: User = None):
         if api_key:
-            api_success, api_response = get_account_details(api_key)
+            api_success, api_response = await get_account_details(api_key)
             if not api_success:
                 return api_response
             gw2_account = api_response.get('name')
@@ -139,7 +139,7 @@ class MemberRoleManager(commands.Cog):
                                f"is already linked to <@{db_user.discord_id}>")
                 return BOT_MESSAGES['GW2_ACCOUNT_ALREADY_LINKED']
 
-        guild_member = get_guild_member(gw2_account)
+        guild_member = await get_guild_member(gw2_account)
         if not guild_member or guild_member.get('rank') == 'invited':
             await user.add_roles(server.get_role(GUILD['ROLES']['NONMEMBER']))
             await _set_nick_name(user, gw2_account)
@@ -289,7 +289,7 @@ class MemberRoleManager(commands.Cog):
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
         discord_members = server.members
-        guild_members = get_guild_members()
+        guild_members = await get_guild_members()
         db_members = get_all_db_users()
 
         for db_member in db_members:

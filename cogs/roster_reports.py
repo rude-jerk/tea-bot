@@ -23,7 +23,7 @@ class RosterReports(commands.Cog):
         await inter.response.defer(ephemeral=True, with_message=True)
         logger.info(f"{inter.user.display_name} [{inter.user.id}] requested in-game guild roster")
 
-        members = get_guild_members()
+        members = await get_guild_members()
         if not members:
             inter.followup.send("Looks like something went wrong with the GW2 API, please try again later.")
             return
@@ -41,7 +41,7 @@ class RosterReports(commands.Cog):
 
         server: Guild = self.bot.get_guild(BOT_CONFIG['SERVER'])
         server_members = server.members
-        members = get_guild_members()
+        members = await get_guild_members()
 
         if not members:
             inter.followup.send("Looks like something went wrong with the GW2 API, please try again later.")
