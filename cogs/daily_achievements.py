@@ -3,6 +3,7 @@ import logging
 
 from disnake import ApplicationCommandInteraction as Inter, Embed
 from disnake.ext import commands, tasks
+import pytz
 
 from config import LOG_NAME
 from utils.api import get_dailies, AchievementTypes
@@ -31,7 +32,7 @@ class DailyAchievements(commands.Cog):
 
         return daily_embed
 
-    @tasks.loop(time=datetime.time(hour=12, minute=5))
+    @tasks.loop(time=[datetime.time(hour=0, minute=4, tzinfo=pytz.utc)])
     async def create_dailies(self):
         self.dailies = None
         logger.info('[UPDATE DAILIES] Update dailies starting')
