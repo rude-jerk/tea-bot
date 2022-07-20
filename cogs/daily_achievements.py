@@ -31,7 +31,7 @@ class DailyAchievements(commands.Cog):
 
         return daily_embed
 
-    @tasks.loop(time=datetime.time(hour=0, minute=3))
+    @tasks.loop(time=datetime.time(hour=12, minute=5))
     async def create_dailies(self):
         self.dailies = None
         logger.info('[UPDATE DAILIES] Update dailies starting')

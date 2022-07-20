@@ -27,6 +27,12 @@ def get_user_by_gw2_account_id(account_id: str):
         filter(func.lower(GuildMember.gw2_account_id) == func.lower(account_id)).first()
 
 
+def delete_user_by_discord_id(discord_id: str):
+    user = get_user_by_discord_id(discord_id)
+    db_session.delete(user)
+    db_session.commit()
+
+
 def remove_user_gw2_account_id(discord_id: str):
     success = db_session.query(GuildMember).filter(GuildMember.discord_id == discord_id).update(
         {GuildMember.gw2_account_id: None, GuildMember.gw2_api_key: None})
