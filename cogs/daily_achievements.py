@@ -32,7 +32,9 @@ class DailyAchievements(commands.Cog):
 
         return daily_embed
 
-    @tasks.loop(time=[datetime.time(hour=0, minute=20, tzinfo=pytz.utc)])
+    @tasks.loop(time=[datetime.time(hour=0, minute=20, tzinfo=pytz.utc),
+                      datetime.time(hour=1, minute=20, tzinfo=pytz.utc),
+                      datetime.time(hour=4, minute=20, tzinfo=pytz.utc)])
     async def create_dailies(self):
         self.dailies = None
         logger.info('[UPDATE DAILIES] Update dailies starting')
