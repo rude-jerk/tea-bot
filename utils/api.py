@@ -7,6 +7,8 @@ import aiohttp
 from config import GUILD, API_ENDPOINTS, BOT_CONFIG, BOT_MESSAGES, LOG_NAME
 from configs.fractals import fractals
 
+from datetime import datetime
+
 logger = logging.getLogger(LOG_NAME)
 
 
@@ -50,6 +52,8 @@ class AchievementTypes(Enum):
 
 
 async def get_dailies():
+    schema = '2022-03-23T19:00:00.000Z'
+
     async with aiohttp.ClientSession() as session:
         async with session.get(API_ENDPOINTS['GW2_DAILIES']) as response:
             dailies_payload = await response.json()
@@ -66,7 +70,7 @@ async def get_dailies():
 
                 try:
                     async with session.get(API_ENDPOINTS['GW2_ACHIEVEMENTS'],
-                                           params={'id': daily.get('id')}) as response:
+                                           params={'id': daily.get('id'), 'v': schema}) as response:
                         r = await response.json()
                 except Exception:
                     continue
@@ -83,11 +87,11 @@ async def get_dailies():
             if len(category_list):
                 achievement_dict[daily_cat] = category_list
 
-        async with session.get(API_ENDPOINTS['GW2_ACHIEVE_CATEGORIES'], params={'id': 250}) as response:
+        async with session.get(API_ENDPOINTS['GW2_ACHIEVE_CATEGORIES'], params={'id': 250, 'v': schema}) as response:
             r = await response.json()
-            strike_achieve_list = [str(x) for x in r.get('achievements')]
+            strike_achieve_list = [str(x.get('id')) for x in r.get('achievements')]
         async with session.get(API_ENDPOINTS['GW2_ACHIEVEMENTS'],
-                               params={'ids': ','.join(strike_achieve_list)}) as response:
+                               params={'ids': ','.join(strike_achieve_list), 'v': schema}) as response:
             r = await response.json()
             achievement_dict['strikes'] = [
                 {'name': x.get('name'), 'description': x.get('requirement'), 'required': x.get('tiers')[0].get('count')}

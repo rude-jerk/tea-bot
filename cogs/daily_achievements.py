@@ -21,7 +21,7 @@ class DailyAchievements(commands.Cog):
         v = self.dailies[achievement_type]
         daily_embed = Embed(title=f'GW2 Daily Achievements - {achievement_type.upper()}',
                             timestamp=self.daily_updated)
-        daily_embed.set_footer(text='Updates when bot is restarted, or about 5 minutes after daily reset. '
+        daily_embed.set_footer(text='Updates when bot is restarted, or about 20 minutes after daily reset. '
                                     'Last Updated:')
 
         for daily in v:
@@ -32,7 +32,7 @@ class DailyAchievements(commands.Cog):
 
         return daily_embed
 
-    @tasks.loop(time=[datetime.time(hour=0, minute=4, tzinfo=pytz.utc)])
+    @tasks.loop(time=[datetime.time(hour=0, minute=20, tzinfo=pytz.utc)])
     async def create_dailies(self):
         self.dailies = None
         logger.info('[UPDATE DAILIES] Update dailies starting')
