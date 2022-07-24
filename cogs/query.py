@@ -40,10 +40,14 @@ class Query(commands.Cog):
 
         for wing, encounters in wing_encounter_map.items():
             encounter_values = []
+            k = 0
             for encounter in encounters:
-                v = f"{'💀' if encounter in completed_encounters else '🟢'} {encounter_detail[encounter]}"
+                killed = True if encounter in completed_encounters else False
+                if killed:
+                    k += 1
+                v = f"{'💀' if killed else '🟢'} {encounter_detail[encounter]}"
                 encounter_values.append(v)
-            wing_name = f"{wing_detail[wing]['wing']}: {wing_detail[wing]['name']}"
+            wing_name = f"{wing_detail[wing]['wing']}: {wing_detail[wing]['name']} ({k}/{len(encounters)})"
             raid_embed.add_field(wing_name, value='\n'.join(encounter_values))
 
         raid_embed.set_footer(text='🟢: Alive  💀: Killed')
