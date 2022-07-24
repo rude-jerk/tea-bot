@@ -20,3 +20,5 @@ VISITOR_EXPIRED: "Your `Visitor` role has expired and has been removed, to get i
 REACT_ROLE_ADD: "Added role: `{role_name}`!"
 REACT_ROLE_REMOVE: "Removed role: `{role_name}`!"
 REACT_ROLE_MESSAGE: "Click any of the below buttons to gain a role allowing you to be notified for the respective content!"
+NO_API_KEY: "Looks like I don't know an API Key for you, so I can't perform this function. Try to /tregister with a GW2 API key first."
+API_PERMS: "Your API key doesn't grant the required permissions: `{perm_string}`. Try to /tregister with an API key that has these permissions first."

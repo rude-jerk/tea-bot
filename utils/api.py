@@ -1,13 +1,12 @@
 import logging
 import re
 from enum import Enum
+from typing import List
 
 import aiohttp
 
 from config import GUILD, API_ENDPOINTS, BOT_CONFIG, BOT_MESSAGES, LOG_NAME
 from configs.fractals import fractals
-
-from datetime import datetime
 
 logger = logging.getLogger(LOG_NAME)
 
@@ -98,3 +97,25 @@ async def get_dailies():
                 for x in r]
 
     return achievement_dict
+
+
+async def has_required_permissions(api_key: str, permissions: List[str]):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(API_ENDPOINTS['GW2_TOKEN_INFO'], headers=_build_headers(api_key)) as r:
+            try:
+                r_json = await r.json()
+                for permission in permissions:
+                    if permission not in r_json.get('permissions'):
+                        return False
+                return True
+            except Exception:
+                return False
+
+
+async def get_account_raids(api_key: str):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(API_ENDPOINTS['GW2_ACCOUNT_RAIDS'], headers=_build_headers(api_key)) as r:
+            try:
+                return await r.json()
+            except Exception:
+                return []
