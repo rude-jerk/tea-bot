@@ -14,5 +14,7 @@ npc_quotes = [
     {"name": "Asura", "quote": "Six feet tall!",
      "avatar": "https://www.dropbox.com/s/scz9wr6vqepjqqc/gremlin.png?raw=1"},
     {"name": "Lion's Arch Banker", "quote": "More violets I say...less violence.",
-     "avatar": "https://www.dropbox.com/s/7d6rjoca31vrt9s/lions_arch_banker.png?raw=1"}
+     "avatar": "https://www.dropbox.com/s/7d6rjoca31vrt9s/lions_arch_banker.png?raw=1"},
+    {"name": "Soulless Horror", "quote": "You dare draw breath in the Realm of the Dead?",
+     "avatar": "https://www.dropbox.com/s/9y9z9uwzz0p34zx/smoxxi.png?raw=1"}
 ]
