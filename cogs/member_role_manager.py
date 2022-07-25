@@ -339,13 +339,15 @@ class MemberRoleManager(commands.Cog):
     @commands.user_command(name='gw2account', default_member_permissions=Permissions(moderate_members=True))
     async def inspect_discord_member(self, inter: Inter, user: User):
         await inter.response.defer(ephemeral=True, with_message=True)
+        logger.info(f"gw2account user command for {user.display_name} [{user.id}] from "
+                    f"{inter.user.display_name} [{inter.user.id}]")
 
         db_user = get_user_by_discord_id(str(user.id))
         if not db_user or not db_user.gw2_account_id:
             await inter.followup.send(f"{user.mention} is not linked to a GW2 account.")
         elif db_user.gw2_api_key:
-            await inter.followup.send(f"{user.mention} is linked to {db_user.gw2_account_id} with permissions "
-                                      f"`{', '.join(await get_api_permissions(db_user.gw2_api_key))}`")
+            await inter.followup.send(f"{user.mention} is linked to {db_user.gw2_account_id} via API key with "
+                                      f"permissions {', '.join(await get_api_permissions(db_user.gw2_api_key))}`")
         else:
             await inter.followup.send(f"{user.mention} is linked to {db_user.gw2_account_id}")
 
