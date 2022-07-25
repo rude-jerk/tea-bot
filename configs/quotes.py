@@ -16,5 +16,7 @@ npc_quotes = [
     {"name": "Lion's Arch Banker", "quote": "More violets I say...less violence.",
      "avatar": "https://www.dropbox.com/s/7d6rjoca31vrt9s/lions_arch_banker.png?raw=1"},
     {"name": "Soulless Horror", "quote": "You dare draw breath in the Realm of the Dead?",
-     "avatar": "https://www.dropbox.com/s/p9od3o7oi50m7ae/soulless_horror.png?raw=1"}
+     "avatar": "https://www.dropbox.com/s/p9od3o7oi50m7ae/soulless_horror.png?raw=1"},
+    {"name": "Dhuum", "quote": "Breathe your last",
+     "avatar": "https://www.dropbox.com/s/jmfo1bo38z3dgss/dhuum.png?raw=1"}
 ]
