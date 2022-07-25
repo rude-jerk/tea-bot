@@ -15,7 +15,7 @@ class Query(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.slash_command(name='raid', description='Current raid encounter status. Requires /tregister with an API '
+    @commands.slash_command(name='raid', description='Current raid encounter status. Requires an API '
                                                      'key with account, progression permissions')
     async def raid_encounter_detail(self, inter: Inter, private: bool = commands.Param(default=True,
                                                                                        description='Send raid progress '
