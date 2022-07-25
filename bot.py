@@ -40,4 +40,5 @@ if __name__ == '__main__':
     bot.load_extension('cogs.react_roles')
     bot.load_extension('cogs.daily_achievements')
     bot.load_extension('cogs.query')
+    bot.load_extension('cogs.hirdy')
     bot.run(BOT_CONFIG['BOT_TOKEN'])

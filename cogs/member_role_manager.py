@@ -313,8 +313,7 @@ class MemberRoleManager(commands.Cog):
 
                 hierarchy_rank = GUILD['ROLES']['HIERARCHY'].get(guild_rank.upper()) if guild_rank else None
                 if hierarchy_rank and hierarchy_rank > GUILD['BOT_MAX_HIERARCHY']:
-                    guild_rank = 'PREFECT'
-                    discord_rank = GUILD['BOT_MAX_RANK']
+                    continue
                 else:
                     discord_rank = GUILD['ROLES'].get(guild_rank.upper()) if guild_rank else None
 
