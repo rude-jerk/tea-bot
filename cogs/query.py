@@ -23,7 +23,7 @@ class Query(commands.Cog):
                                                                                                    ': True')):
         await inter.response.defer(with_message=True, ephemeral=True if private else False)
         logger.info(f"/raid from {inter.user.display_name} [{inter.user.id}]")
-        api_perms = ['account']
+        api_perms = ['account', 'progression']
 
         db_user = get_user_by_discord_id(str(inter.user.id))
         api_key = None if db_user is None else db_user.gw2_api_key
