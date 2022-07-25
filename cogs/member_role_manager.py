@@ -347,7 +347,7 @@ class MemberRoleManager(commands.Cog):
             await inter.followup.send(f"{user.mention} is not linked to a GW2 account.")
         elif db_user.gw2_api_key:
             await inter.followup.send(f"{user.mention} is linked to {db_user.gw2_account_id} via API key with "
-                                      f"permissions {', '.join(await get_api_permissions(db_user.gw2_api_key))}`")
+                                      f"permissions `{', '.join(await get_api_permissions(db_user.gw2_api_key))}`")
         else:
             await inter.followup.send(f"{user.mention} is linked to {db_user.gw2_account_id}")
 
