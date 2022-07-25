@@ -18,7 +18,7 @@ class Query(commands.Cog):
     @commands.slash_command(name='raid', description='Current raid encounter status. Requires /tregister with an API '
                                                      'key with account permissions')
     async def raid_encounter_detail(self, inter: Inter):
-        await inter.response.defer(with_message=True)
+        await inter.response.defer(with_message=True, ephemeral=True)
         logger.info(f"/raid from {inter.user.display_name} [{inter.user.id}]")
         api_perms = ['account']
 
@@ -26,12 +26,11 @@ class Query(commands.Cog):
         api_key = None if db_user is None else db_user.gw2_api_key
 
         if api_key is None or len(api_key) == 0:
-            await inter.followup.send(BOT_MESSAGES['NO_API_KEY'], delete_after=30)
+            await inter.followup.send(BOT_MESSAGES['NO_API_KEY'])
             return
 
         if not await has_required_permissions(api_key, api_perms):
-            await inter.followup.send(BOT_MESSAGES['API_PERMS'].format(perm_string=', '.join(api_perms)),
-                                      delete_after=30)
+            await inter.followup.send(BOT_MESSAGES['API_PERMS'].format(perm_string=', '.join(api_perms)))
             return
 
         completed_encounters = await get_account_raids(api_key)
