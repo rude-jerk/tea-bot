@@ -31,7 +31,7 @@ encounter_detail = {
     'twisted_castle': 'Twisted Castle',
     'xera': 'Xera',
     'cairn': 'Cairn',
-    'mursaat_overseer': 'Murssat Overseer',
+    'mursaat_overseer': 'Mursaat Overseer',
     'samarog': 'Samarog',
     'deimos': 'Deimos',
     'soulless_horror': 'Soulless Horror',
