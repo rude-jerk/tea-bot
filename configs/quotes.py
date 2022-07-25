@@ -3,7 +3,7 @@ npc_quotes = [
      "avatar": "https://www.dropbox.com/s/ya1sqzt3alomxy0/saul.png?raw=1"},
     {"name": "Crystallographer Smoxxi", "quote": "Let's talk about what's really important - CRYSTALS!",
      "avatar": "https://www.dropbox.com/s/9y9z9uwzz0p34zx/smoxxi.png?raw=1"},
-    {"name": "Reaper of the Ice Wasts", "quote": "Dhuum's gaze falls upon me!",
+    {"name": "Reaper of the Ice Wastes", "quote": "Dhuum's gaze falls upon me!",
      "avatar": "https://www.dropbox.com/s/cr4o0qkdqe6shwm/reaper.png?raw=1"},
     {"name": "Crusader Aurus Fuseblight", "quote": "Burn me, it's a stingray.",
      "avatar": "https://www.dropbox.com/s/x0kgxetegjsovq6/aurus.png?raw=1"},
