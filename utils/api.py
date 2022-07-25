@@ -99,17 +99,22 @@ async def get_dailies():
     return achievement_dict
 
 
-async def has_required_permissions(api_key: str, permissions: List[str]):
+async def get_api_permissions(api_key: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(API_ENDPOINTS['GW2_TOKEN_INFO'], headers=_build_headers(api_key)) as r:
             try:
                 r_json = await r.json()
-                for permission in permissions:
-                    if permission not in r_json.get('permissions'):
-                        return False
-                return True
+                return r_json.get('permissions')
             except Exception:
-                return False
+                return []
+
+
+async def has_required_permissions(api_key: str, permissions: List[str]):
+    api_permissions = await get_api_permissions(api_key)
+    for permission in permissions:
+        if permission not in api_permissions:
+            return False
+    return True
 
 
 async def get_account_raids(api_key: str):

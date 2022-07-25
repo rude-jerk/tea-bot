@@ -1,9 +1,9 @@
 import datetime
 import logging
 
+import pytz
 from disnake import ApplicationCommandInteraction as Inter, Embed
 from disnake.ext import commands, tasks
-import pytz
 
 from config import LOG_NAME
 from utils.api import get_dailies, AchievementTypes

@@ -8,7 +8,7 @@ from disnake.ext.commands import Bot
 
 from config import BOT_MESSAGES, BOT_CONFIG, GUILD, LOG_NAME
 from interface.views.visitor_view import VisitorView
-from utils.api import get_guild_member, get_account_details, get_guild_members
+from utils.api import get_guild_member, get_account_details, get_guild_members, get_api_permissions
 from utils.channel_logger import send_log
 from utils.users import *
 
@@ -335,6 +335,19 @@ class MemberRoleManager(commands.Cog):
                             logger.error(e, exc_info=True)
 
         logger.info("[AUTO ROLES] Guild role polling completed")
+
+    @commands.user_command(name='gw2account', default_member_permissions=Permissions(moderate_members=True))
+    async def inspect_discord_member(self, inter: Inter, user: User):
+        await inter.response.defer(ephemeral=True, with_message=True)
+
+        db_user = get_user_by_discord_id(str(user.id))
+        if not db_user or not db_user.gw2_account_id:
+            await inter.followup.send(f"{user.mention} is not linked to a GW2 account.")
+        elif db_user.gw2_api_key:
+            await inter.followup.send(f"{user.mention} is linked to {db_user.gw2_account_id} with permissions "
+                                      f"`{', '.join(await get_api_permissions(db_user.gw2_api_key))}`")
+        else:
+            await inter.followup.send(f"{user.mention} is linked to {db_user.gw2_account_id}")
 
     @commands.Cog.listener()
     async def on_ready(self):
