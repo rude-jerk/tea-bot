@@ -29,10 +29,12 @@ class Query(commands.Cog):
         api_key = None if db_user is None else db_user.gw2_api_key
 
         if api_key is None or len(api_key) == 0:
+            logger.info(f"/raid from {inter.user.display_name} [{inter.user.id}] failed. No API key.")
             await inter.followup.send(BOT_MESSAGES['NO_API_KEY'])
             return
 
         if not await has_required_permissions(api_key, api_perms):
+            logger.info(f"/raid from {inter.user.display_name} [{inter.user.id}] failed. Missing API permissions.")
             await inter.followup.send(BOT_MESSAGES['API_PERMS'].format(perm_string=', '.join(api_perms)))
             return
 
