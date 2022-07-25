@@ -1,4 +1,5 @@
 import logging
+from enum import Enum
 
 from disnake import ApplicationCommandInteraction as Inter, Embed
 from disnake.ext import commands
@@ -17,8 +18,8 @@ class Query(commands.Cog):
 
     @commands.slash_command(name='raid', description='Current raid encounter status. Requires /tregister with an API '
                                                      'key with account permissions')
-    async def raid_encounter_detail(self, inter: Inter):
-        await inter.response.defer(with_message=True, ephemeral=True)
+    async def raid_encounter_detail(self, inter: Inter, private: bool = True):
+        await inter.response.defer(with_message=True, ephemeral=True if private else False)
         logger.info(f"/raid from {inter.user.display_name} [{inter.user.id}]")
         api_perms = ['account']
 
