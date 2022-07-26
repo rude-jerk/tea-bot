@@ -19,10 +19,14 @@ npc_quotes = [
       "avatar": "https://www.dropbox.com/s/9gw79euni5fmq2l/vigil_craftsman_3.png?raw=1"}],
     {"name": "Asura", "quote": "Six feet tall!",
      "avatar": "https://www.dropbox.com/s/scz9wr6vqepjqqc/gremlin.png?raw=1"},
+    {"name": "Human", "quote": "I could outrun a centaur!",
+     "avatar": "https://www.dropbox.com/s/za5cyc5dfncx7f6/human.png?raw=1"},
     {"name": "Lion's Arch Banker", "quote": "More violets I say...less violence.",
      "avatar": "https://www.dropbox.com/s/7d6rjoca31vrt9s/lions_arch_banker.png?raw=1"},
     {"name": "Soulless Horror", "quote": "You dare draw breath in the Realm of the Dead?",
      "avatar": "https://www.dropbox.com/s/p9od3o7oi50m7ae/soulless_horror.png?raw=1"},
-    {"name": "Dhuum", "quote": "Breathe your last",
-     "avatar": "https://www.dropbox.com/s/jmfo1bo38z3dgss/dhuum.png?raw=1"}
+    {"name": "Dhuum", "quote": "Breathe your last.",
+     "avatar": "https://www.dropbox.com/s/jmfo1bo38z3dgss/dhuum.png?raw=1"},
+    {"name": "Matthias Gabrel", "quote": "Your sacrifice will bring him life!",
+     "avatar": "https://www.dropbox.com/s/jrn513tbpqazab9/matthias.png?raw=1"}
 ]
