@@ -6,6 +6,7 @@ from disnake.ext import commands
 
 from config import BOT_CONFIG, LOG_NAME
 from configs.quotes import npc_quotes
+from typing import List
 
 logger = logging.getLogger(LOG_NAME)
 
@@ -34,7 +35,11 @@ class HirdyEcho(commands.Cog):
             logger.error('Unable to find HIRDY WEBHOOK')
             return
         quote = choice(npc_quotes)
-        await this_webhook.send(username=quote['name'], content=quote['quote'], avatar_url=quote['avatar'])
+        if isinstance(quote, List):
+            for q in quote:
+                await this_webhook.send(username=q['name'], content=q['quote'], avatar_url=q['avatar'])
+        else:
+            await this_webhook.send(username=quote['name'], content=quote['quote'], avatar_url=quote['avatar'])
 
 
 def setup(bot):
