@@ -1,4 +1,5 @@
 import logging
+import random
 from random import choice
 
 from disnake import Webhook
@@ -20,6 +21,7 @@ def is_hirdy_channel(ctx: commands.Context):
 class HirdyEcho(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
+        self.stored_quote = None
 
     @commands.command('hirdy')
     @commands.check(is_hirdy_channel)
@@ -36,7 +38,13 @@ class HirdyEcho(commands.Cog):
         if not webhook:
             logger.error('Unable to find HIRDY WEBHOOK')
             return
-        quote = choice(npc_quotes)
+        r = random.randint(0, len(npc_quotes)-1)
+        quote = npc_quotes.pop(r)
+
+        if self.stored_quote:
+            npc_quotes.append(self.stored_quote)
+            self.stored_quote = quote
+
         if isinstance(quote, List):
             for q in quote:
                 await this_webhook.send(username=q['name'], content=q['quote'], avatar_url=q['avatar'])
