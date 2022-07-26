@@ -28,5 +28,7 @@ npc_quotes = [
     {"name": "Dhuum", "quote": "Breathe your last.",
      "avatar": "https://www.dropbox.com/s/jmfo1bo38z3dgss/dhuum.png?raw=1"},
     {"name": "Matthias Gabrel", "quote": "Your sacrifice will bring him life!",
-     "avatar": "https://www.dropbox.com/s/jrn513tbpqazab9/matthias.png?raw=1"}
+     "avatar": "https://www.dropbox.com/s/jrn513tbpqazab9/matthias.png?raw=1"},
+    {"name": "PR&T Researcher", "quote": "Someday I will establish my prominence.",
+     "avatar": "https://www.dropbox.com/s/iooa25kimimlvrk/prt_researcher.png?raw=1"}
 ]
