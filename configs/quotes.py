@@ -10,7 +10,7 @@ npc_quotes = [
     {"name": "Kestrel Zuru", "quote": "This is a place of refuge! Not a...den of iniquity.",
      "avatar": "https://www.dropbox.com/s/nm0w4pkls6m8dnr/kestrel_zuru.png?raw=1"},
     [{"name": "Vigil Crusader", "quote": "Wow! That's quality armor.",
-     "avatar": "https://www.dropbox.com/s/mwq2ipe9yrdu9pf/vigil_crusader.png?raw=1"},
+     "avatar": "https://www.dropbox.com/s/mwq2ipe9yrdu9pf/vigil_crusader.png?raw=1", "sleep_after": True},
      {"name": "Vigil Craftsman 1", "quote": "Thanks!",
       "avatar": "https://www.dropbox.com/s/qfukxvjmfp4zt0b/vigil_craftsman_1.png?raw=1"},
      {"name": "Vigil Craftsman 2", "quote": "Thanks!",

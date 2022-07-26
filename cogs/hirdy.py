@@ -8,6 +8,8 @@ from config import BOT_CONFIG, LOG_NAME
 from configs.quotes import npc_quotes
 from typing import List
 
+import asyncio
+
 logger = logging.getLogger(LOG_NAME)
 
 
@@ -38,6 +40,8 @@ class HirdyEcho(commands.Cog):
         if isinstance(quote, List):
             for q in quote:
                 await this_webhook.send(username=q['name'], content=q['quote'], avatar_url=q['avatar'])
+                if q.get('sleep_after', False):
+                    await asyncio.sleep(1)
         else:
             await this_webhook.send(username=quote['name'], content=quote['quote'], avatar_url=quote['avatar'])
 
