@@ -41,7 +41,7 @@ class HirdyEcho(commands.Cog):
 
         if self.stored_quote:
             npc_quotes.append(self.stored_quote)
-            self.stored_quote = quote
+        self.stored_quote = quote
 
         if isinstance(quote, List):
             for q in quote:
