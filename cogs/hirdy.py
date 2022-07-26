@@ -1,15 +1,13 @@
+import asyncio
 import logging
 import random
-from random import choice
+from typing import List
 
 from disnake import Webhook
 from disnake.ext import commands
 
 from config import BOT_CONFIG, LOG_NAME
 from configs.quotes import npc_quotes
-from typing import List
-
-import asyncio
 
 logger = logging.getLogger(LOG_NAME)
 
@@ -38,7 +36,7 @@ class HirdyEcho(commands.Cog):
         if not webhook:
             logger.error('Unable to find HIRDY WEBHOOK')
             return
-        r = random.randint(0, len(npc_quotes)-1)
+        r = random.randint(0, len(npc_quotes) - 1)
         quote = npc_quotes.pop(r)
 
         if self.stored_quote:

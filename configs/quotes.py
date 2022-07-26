@@ -30,5 +30,7 @@ npc_quotes = [
     {"name": "Matthias Gabrel", "quote": "Your sacrifice will bring him life!",
      "avatar": "https://www.dropbox.com/s/jrn513tbpqazab9/matthias.png?raw=1"},
     {"name": "PR&T Researcher", "quote": "Someday I will establish my prominence.",
-     "avatar": "https://www.dropbox.com/s/iooa25kimimlvrk/prt_researcher.png?raw=1"}
+     "avatar": "https://www.dropbox.com/s/iooa25kimimlvrk/prt_researcher.png?raw=1"},
+    {"name": "Minister Li", "quote": "As far as deathbeds go, you could do worse. Enjoy the view!",
+     "avatar": "https://www.dropbox.com/s/zvb4s970nn420tz/minister_li.png?raw=1"}
 ]
