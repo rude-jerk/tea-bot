@@ -15,8 +15,8 @@ this_dir = dirname(__file__)
 logger = logging.getLogger(LOG_NAME)
 logger.setLevel(logging.DEBUG)
 if not len(logger.handlers):
-    handler = RotatingFileHandler(filename=join(this_dir, 'logs/tea.log'), encoding='utf-8', mode='w', maxBytes=10000,
-                                  backupCount=10)
+    handler = RotatingFileHandler(filename=join(this_dir, 'logs/tea.log'), encoding='utf-8', mode='w', maxBytes=50000,
+                                  backupCount=5)
     handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
     logger.addHandler(handler)
 
