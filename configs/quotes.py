@@ -32,5 +32,9 @@ npc_quotes = [
     {"name": "PR&T Researcher", "quote": "Someday I will establish my prominence.",
      "avatar": "https://www.dropbox.com/s/iooa25kimimlvrk/prt_researcher.png?raw=1"},
     {"name": "Minister Li", "quote": "As far as deathbeds go, you could do worse. Enjoy the view!",
-     "avatar": "https://www.dropbox.com/s/zvb4s970nn420tz/minister_li.png?raw=1"}
+     "avatar": "https://www.dropbox.com/s/zvb4s970nn420tz/minister_li.png?raw=1"},
+    {"name": "Gorrik", "quote": "Don't masticate where you hibernate.",
+     "avatar": "https://www.dropbox.com/s/50lwca5y8hotln1/gorrik.png?raw=1"},
+    {"name": "Gorrik", "quote": "In fact, I was charged with \"bioterrorism\" in Amnoon.",
+     "avatar": "https://www.dropbox.com/s/50lwca5y8hotln1/gorrik.png?raw=1"},
 ]
