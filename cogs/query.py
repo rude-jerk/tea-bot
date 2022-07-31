@@ -40,7 +40,8 @@ class Query(commands.Cog):
 
         completed_encounters = await get_account_raids(api_key)
         raid_embed = Embed(title='Weekly Raid Encounters')
-        raid_embed.set_author(name=inter.user.display_name, icon_url=inter.user.avatar)
+        raid_embed.set_author(name=inter.user.display_name,
+                              icon_url=inter.user.avatar if inter.user.avatar else inter.user.default_avatar)
 
         for wing, encounters in wing_encounter_map.items():
             encounter_values = []
