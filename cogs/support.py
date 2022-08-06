@@ -9,6 +9,7 @@ from disnake.ext.commands import Bot, Context
 from config import BOT_CONFIG, LOG_NAME, BOT_MESSAGES
 from interface.views.support_request_view import SupportInfoView, create_action_row, SupportOpts
 from utils.support import get_support_by_notification_id, update_support_status, get_support_by_channel_id
+from utils.embed_builder import add_content_to_embed
 
 logger = logging.getLogger(LOG_NAME)
 
@@ -108,7 +109,7 @@ class Support(commands.Cog):
             embed = Embed(title=support_ticket.ticket_type)
             embed.add_field('Ticket Submitter', value=request_user.mention)
             embed.add_field('Ticket Handler', value=support_user.mention)
-            embed.add_field('Ticket Content', value=support_ticket.description, inline=False)
+            add_content_to_embed(embed, support_ticket.description)
             await channel.send(f'{support_user.mention} {request_user.mention} '
                                f'Please use this channel to resolve the following issue. '
                                f'Either party can use the `!resolve` command to mark the ticket as resolved and close '

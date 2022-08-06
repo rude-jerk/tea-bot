@@ -9,6 +9,7 @@ from disnake.ui import View, Select, Modal, TextInput, button
 
 from config import LOG_NAME, BOT_CONFIG, BOT_MESSAGES
 from utils.support import create_support_ticket
+from utils.embed_builder import add_content_to_embed
 
 logger = logging.getLogger(LOG_NAME)
 
@@ -45,7 +46,7 @@ class SupportModal(Modal):
                          components=components)
 
     async def callback(self, inter: ModalInteraction, /) -> None:
-
+        logger.info(f"Support modal submission from {inter.user.display_name}")
         embed = Embed(title=f'Support Request: {self.feedback_type.value}')
 
         if self.support_anon and inter.text_values['supp_mod_anon'] and inter.text_values['supp_mod_anon'] == 'Y':
@@ -54,7 +55,7 @@ class SupportModal(Modal):
         else:
             embed.set_author(name=inter.author.display_name,
                              icon_url=inter.author.avatar if inter.author.avatar else inter.author.default_avatar)
-        embed.add_field('Text', value=inter.text_values['supp_mod_desc'])
+        add_content_to_embed(embed, inter.text_values['supp_mod_desc'])
         if not self.chat:
             feedback_channel = self.bot.get_channel(BOT_CONFIG['FEEDBACK_CHANNEL'])
             embed.set_footer(text='No chat required.')
@@ -107,6 +108,7 @@ class CategoryDropdown(Select):
         )
 
     async def callback(self, inter: MessageInteraction, /):
+        logger.info(f"Sending support modal to {inter.user.display_name}")
         await inter.response.send_modal(modal=SupportModal(self.bot, self.values[0]))
 
 
@@ -133,6 +135,7 @@ class SupportInfoView(View):
 
     @button(label='Get Support', style=ButtonStyle.blurple, custom_id='supp_info_get_supp')
     async def get_support(self, this_button, inter: MessageInteraction):
+        logger.info(f"Get Support click from {inter.user.display_name}")
         try:
             await inter.user.send(BOT_MESSAGES['SUPPORT_REQUEST_MESSAGE'], view=SupportRequestView(self.bot),
                                   delete_after=12 * 60)
