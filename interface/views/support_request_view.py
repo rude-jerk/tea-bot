@@ -61,7 +61,11 @@ class SupportModal(Modal):
             await feedback_channel.send(embed=embed)
             await inter.response.send_message('Your feedback has been submitted!', ephemeral=True)
         else:
-            support_channel = self.bot.get_channel(BOT_CONFIG['SUPPORT_REQUEST_CHANNEL'])
+            if self.feedback_type == SupportOpts.InGameAssistance:
+                support_channel = self.bot.get_channel(BOT_CONFIG['IN_GAME_SUPPORT_CHANNEL'])
+            else:
+                support_channel = self.bot.get_channel(BOT_CONFIG['SUPPORT_REQUEST_CHANNEL'])
+
             row = create_action_row()
             message = await support_channel.send(embed=embed, components=row)
             create_support_ticket(ticket_type=self.feedback_type.value, chat=True, submit_user=str(inter.user.id),

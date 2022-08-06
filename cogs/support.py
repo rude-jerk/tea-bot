@@ -40,7 +40,10 @@ class Support(commands.Cog):
         if not support_ticket:
             return
         guild = self.bot.get_guild(BOT_CONFIG['SERVER'])
-        notification_channel = self.bot.get_channel(BOT_CONFIG['SUPPORT_REQUEST_CHANNEL'])
+        if support_ticket.ticket_type == SupportOpts.InGameAssistance.value:
+            notification_channel = self.bot.get_channel(BOT_CONFIG['IN_GAME_SUPPORT_CHANNEL'])
+        else:
+            notification_channel = self.bot.get_channel(BOT_CONFIG['SUPPORT_REQUEST_CHANNEL'])
         notification = await notification_channel.fetch_message(int(support_ticket.notification_id))
         hist_messages = reversed([f"{message.author.display_name}: {message.content}" for message in
                                   await ctx.channel.history(limit=2000).flatten()])
