@@ -61,6 +61,7 @@ class Query(commands.Cog):
 
     @commands.slash_command(name='exchange', description='Returns the amount of gems/coins received from an exchange')
     async def exchange(self, inter: Inter, currency: ExchangeCurrency, amount: commands.Range[1, 20000]):
+        logger.info(f"/exchange {currency} {amount} from {inter.user.display_name}")
         await inter.response.defer(ephemeral=True, with_message=True)
         currency = ExchangeCurrency(currency)
 
@@ -80,7 +81,6 @@ class Query(commands.Cog):
 
             quantity = (api_res.get('quantity') / 10000)
             await inter.followup.send(f"{amount}💎 will yield approximately {quantity}🪙")
-
 
 
 def setup(bot):
