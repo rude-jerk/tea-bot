@@ -5,7 +5,7 @@ from disnake.ext import commands
 
 from config import BOT_MESSAGES, LOG_NAME
 from configs.raids import encounter_detail, wing_detail, wing_encounter_map
-from utils.api import has_required_permissions, get_account_raids
+from utils.api import has_required_permissions, get_account_raids, ExchangeCurrency, get_exchange
 from utils.users import get_user_by_discord_id
 
 logger = logging.getLogger(LOG_NAME)
@@ -58,6 +58,29 @@ class Query(commands.Cog):
         raid_embed.set_footer(text='🟢: Alive  💀: Killed')
 
         await inter.followup.send(embed=raid_embed)
+
+    @commands.slash_command(name='exchange', description='Returns the amount of gems/coins received from an exchange')
+    async def exchange(self, inter: Inter, currency: ExchangeCurrency, amount: commands.Range[1, 20000]):
+        await inter.response.defer(ephemeral=True, with_message=True)
+        currency = ExchangeCurrency(currency)
+
+        if currency == ExchangeCurrency.Gold:
+            converted_amount = amount * 100 * 100
+            api_res = await get_exchange(currency, converted_amount)
+            if not api_res:
+                await inter.followup.send('Something went wrong with the GW2 API...')
+                return
+
+            await inter.followup.send(f'{amount}🪙 will yield approximately {api_res.get("quantity")}💎')
+        else:
+            api_res = await get_exchange(currency, amount)
+            if not api_res:
+                await inter.followup.send('Something went wrong with the GW2 API...')
+                return
+
+            quantity = (api_res.get('quantity') / 10000)
+            await inter.followup.send(f"{amount}💎 will yield approximately {quantity}🪙")
+
 
 
 def setup(bot):

@@ -124,3 +124,19 @@ async def get_account_raids(api_key: str):
                 return await r.json()
             except Exception:
                 return []
+
+
+class ExchangeCurrency(Enum):
+    Gold = 'gold'
+    Gems = 'gems'
+
+
+async def get_exchange(currency: ExchangeCurrency, amount: int):
+    async with aiohttp.ClientSession() as session:
+        endpoint = API_ENDPOINTS['GW2_EXCHANGE_COINS'] if currency == ExchangeCurrency.Gold \
+            else API_ENDPOINTS['GW2_EXCHANGE_GEMS']
+        async with session.get(endpoint, params={'quantity': amount}) as r:
+            try:
+                return await r.json()
+            except Exception:
+                return None
