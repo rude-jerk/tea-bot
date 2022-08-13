@@ -64,10 +64,9 @@ class Membership(commands.Cog):
 
         for channel, status in channel_map.items():
             emoji = ''
-            match status:
-                case 'IN_PROGRESS':
+            if status == 'IN_PROGRESS':
                     emoji = '⏳'
-                case 'DONE':
+            if status == 'DONE':
                     emoji = '✅'
             message += f"{emoji}{channel.mention}\n"
         embed.add_field(name='Channels', value=message)
