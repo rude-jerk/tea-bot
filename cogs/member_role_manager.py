@@ -335,7 +335,7 @@ class MemberRoleManager(commands.Cog):
 
                 removed_roles = await _demote_by_guild_rank(server, discord_member, guild_rank.upper())
                 for removed_role in removed_roles:
-                    await send_log(f"Auto removed role {removed_role} from {discord_member.mention}")
+                    await send_log(server, f"Auto removed role {removed_role} from {discord_member.mention}")
 
                 if guild_rank == 'invited':
                     continue
