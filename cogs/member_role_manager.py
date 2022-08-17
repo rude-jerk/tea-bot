@@ -51,6 +51,29 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
     return given_roles
 
 
+async def _demote_by_guild_rank(server: Guild, discord_member: Member, role_name: str):
+    role_rank = hierarchy[role_name]
+    taken_roles = []
+    higher_roles = []
+    for rank in range(GUILD['BOT_RANK_RANGE']):
+        rank = rank + 1
+        if rank <= role_rank:
+            continue
+        role_key = list(hierarchy.keys())[list(hierarchy.values()).index(rank)]
+        higher_role = GUILD['ROLES'].get(role_key)
+        if higher_role:
+            higher_roles.append(higher_role)
+    roles = [server.get_role(role) for role in higher_roles]
+    if len(roles) > 0:
+        for role in roles:
+            if role in discord_member.roles:
+                logger.info(f"Removing {role.name} from {discord_member.display_name} [{discord_member.id}]")
+                await discord_member.remove_roles(role, reason=f'[AUTO] Guild role: {role_name}')
+                taken_roles.append(role.name)
+
+    return taken_roles
+
+
 async def _add_minimum_guild_rank(server: Guild, discord_member: Member, guild_rank: str, auto: bool = False):
     try:
         await _remove_low_roles(discord_member, [server.get_role(GUILD['ROLES']['NONMEMBER']),
@@ -311,6 +334,9 @@ class MemberRoleManager(commands.Cog):
                 if not db_member.get('gw2_api_key') and guild_rank:
                     guild_rank = 'FRESHMAN'
 
+                removed_roles = await _demote_by_guild_rank(server, discord_member, guild_rank.upper())
+                for removed_role in removed_roles:
+                    await send_log(f"Auto removed role {removed_role.name} from {discord_member.mention}")
                 hierarchy_rank = GUILD['ROLES']['HIERARCHY'].get(guild_rank.upper()) if guild_rank else None
                 if hierarchy_rank and hierarchy_rank > GUILD['BOT_MAX_HIERARCHY']:
                     continue
