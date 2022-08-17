@@ -53,6 +53,9 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
 
 async def _demote_by_guild_rank(server: Guild, discord_member: Member, role_name: str):
     role_rank = hierarchy[role_name]
+    if role_rank > GUILD['BOT_MAX_HIERARCHY']:
+        return []
+
     taken_roles = []
     higher_roles = []
     for rank in range(GUILD['BOT_RANK_RANGE']):
@@ -329,14 +332,16 @@ class MemberRoleManager(commands.Cog):
 
                 member_role_ids = [role.id for role in discord_member.roles]
                 guild_rank = guild_member.get('rank')
+
+                removed_roles = await _demote_by_guild_rank(server, discord_member, guild_rank.upper())
+                for removed_role in removed_roles:
+                    await send_log(f"Auto removed role {removed_role} from {discord_member.mention}")
+
                 if guild_rank == 'invited':
                     continue
                 if not db_member.get('gw2_api_key') and guild_rank:
                     guild_rank = 'FRESHMAN'
 
-                removed_roles = await _demote_by_guild_rank(server, discord_member, guild_rank.upper())
-                for removed_role in removed_roles:
-                    await send_log(f"Auto removed role {removed_role.name} from {discord_member.mention}")
                 hierarchy_rank = GUILD['ROLES']['HIERARCHY'].get(guild_rank.upper()) if guild_rank else None
                 if hierarchy_rank and hierarchy_rank > GUILD['BOT_MAX_HIERARCHY']:
                     continue
