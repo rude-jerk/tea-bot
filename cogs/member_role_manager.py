@@ -136,12 +136,16 @@ class MemberRoleManager(commands.Cog):
     @commands.slash_command(name='tenabled', default_member_permissions=Permissions(administrator=True),
                             description='Toggles the ability to join discord as a visitor, tjoin, and tregister.')
     async def toggle_joining(self, inter: Inter):
+        server = self.bot.get_guild(BOT_CONFIG['SERVER'])
+
         if self.enabled:
             self.enabled = False
             await inter.response.send_message('Join commands disabled.', ephemeral=True)
+            await send_log(server, f"{inter.user.mention} disabled joining the server.")
         else:
             self.enabled = True
             await inter.response.send_message('Join commands enabled.', ephemeral=True)
+            await send_log(server, f"{inter.user.mention} enabled joining the server.")
 
     @staticmethod
     async def _handle_user_update(server: Guild, user: Member, gw2_account: str = None, api_key: str = None,
