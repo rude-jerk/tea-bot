@@ -133,7 +133,7 @@ class MemberRoleManager(commands.Cog):
         self.bot = bot
         self.enabled = True
 
-    @commands.slash_command(name='tenabled', default_member_permissions=Permissions(administrator=True),
+    @commands.slash_command(name='tenabled', default_member_permissions=Permissions(moderate_members=True),
                             description='Toggles the ability to join discord as a visitor, tjoin, and tregister.')
     async def toggle_joining(self, inter: Inter):
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
