@@ -271,6 +271,8 @@ class MemberRoleManager(commands.Cog):
                                                                                            " ex: abcd.1234")):
         if not self.enabled:
             await inter.response.send_message(BOT_MESSAGES['JOIN_DISABLED'], ephemeral=True)
+            return
+
         await inter.response.defer(ephemeral=True, with_message=True)
         logger.info(f"/tjoin from {inter.user.display_name} [{inter.user.id}]")
 
@@ -291,6 +293,8 @@ class MemberRoleManager(commands.Cog):
                                                                                  description="Your GW2 API Key")):
         if not self.enabled:
             await inter.response.send_message(BOT_MESSAGES['JOIN_DISABLED'], ephemeral=True)
+            return
+
         await inter.response.defer(ephemeral=True, with_message=True)
         logger.info(f"/tregister from {inter.user.display_name} [{inter.user.id}]")
 
