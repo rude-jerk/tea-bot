@@ -131,6 +131,17 @@ async def _remove_all_roles(member: Member):
 class MemberRoleManager(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
+        self.enabled = True
+
+    @commands.slash_command(name='tenabled', default_member_permissions=Permissions(administrator=True),
+                            description='Toggles the ability to join discord as a visitor, tjoin, and tregister.')
+    async def toggle_joining(self, inter: Inter):
+        if self.enabled:
+            self.enabled = False
+            await inter.response.send_message('Join commands disabled.', ephemeral=True)
+        else:
+            self.enabled = True
+            await inter.response.send_message('Join commands enabled.', ephemeral=True)
 
     @staticmethod
     async def _handle_user_update(server: Guild, user: Member, gw2_account: str = None, api_key: str = None,
@@ -214,6 +225,8 @@ class MemberRoleManager(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: Member):
+        if not self.enabled:
+            return
         view = VisitorView(self.bot, member.id)
         try:
             view.message = await member.send(BOT_MESSAGES['WELCOME_MESSAGE'], view=view)
@@ -252,6 +265,8 @@ class MemberRoleManager(commands.Cog):
     async def join_discord(self, inter: Inter, user_name: str = commands.Param(name="username",
                                                                                description="Your GW2 Account username"
                                                                                            " ex: abcd.1234")):
+        if not self.enabled:
+            await inter.response.send_message(BOT_MESSAGES['JOIN_DISABLED'], ephemeral=True)
         await inter.response.defer(ephemeral=True, with_message=True)
         logger.info(f"/tjoin from {inter.user.display_name} [{inter.user.id}]")
 
@@ -270,6 +285,8 @@ class MemberRoleManager(commands.Cog):
                             dm_permission=True)
     async def register_discord(self, inter: Inter, api_key: str = commands.Param(name="api_key",
                                                                                  description="Your GW2 API Key")):
+        if not self.enabled:
+            await inter.response.send_message(BOT_MESSAGES['JOIN_DISABLED'], ephemeral=True)
         await inter.response.defer(ephemeral=True, with_message=True)
         logger.info(f"/tregister from {inter.user.display_name} [{inter.user.id}]")
 
