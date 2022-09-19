@@ -52,7 +52,11 @@ async def _add_roles_by_guild_rank(server: Guild, discord_member: Member, role_n
 
 
 async def _demote_by_guild_rank(server: Guild, discord_member: Member, role_name: str):
-    role_rank = hierarchy[role_name]
+    try:
+        role_rank = hierarchy[role_name]
+    except KeyError:
+        return []
+
     if role_rank > GUILD['BOT_MAX_HIERARCHY']:
         return []
 
