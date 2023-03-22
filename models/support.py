@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime
-from bot import db_base
 from datetime import datetime
+
+from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime
+
+from bot import db_base
 
 
 class SupportTicket(db_base):

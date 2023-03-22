@@ -8,8 +8,8 @@ from disnake.ext.commands import Bot, Context
 
 from config import BOT_CONFIG, LOG_NAME, BOT_MESSAGES
 from interface.views.support_request_view import SupportInfoView, create_action_row, SupportOpts
-from utils.support import get_support_by_notification_id, update_support_status, get_support_by_channel_id
 from utils.embed_builder import add_content_to_embed
+from utils.support import get_support_by_notification_id, update_support_status, get_support_by_channel_id
 
 logger = logging.getLogger(LOG_NAME)
 

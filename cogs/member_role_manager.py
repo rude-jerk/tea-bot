@@ -8,7 +8,7 @@ from disnake.ext.commands import Bot
 
 from config import BOT_MESSAGES, BOT_CONFIG, GUILD, LOG_NAME
 from interface.views.visitor_view import VisitorView
-from utils.api import get_guild_member, get_account_details, get_guild_members, get_api_permissions
+from utils.api import get_guild_member, get_account_details, get_guild_members, get_api_permissions, GW2ApiException
 from utils.channel_logger import send_log
 from utils.users import *
 
@@ -217,10 +217,18 @@ class MemberRoleManager(commands.Cog):
                                                               given_roles=given_roles) + \
                        f" {BOT_MESSAGES['USER_NAME_SET'] if user_name_set else BOT_MESSAGES['USER_NAME_UNSET']}"
 
-    async def get_server_and_member(self, member_id: int):
-        server = self.bot.get_guild(BOT_CONFIG['SERVER'])
-        member = server.get_member(member_id)
-        return server, member
+    async def get_server_and_member(self, inter: Inter, reason: str = 'command'):
+        logger.info(f"{reason} from {inter.user.display_name} [{inter.user.id}")
+
+        member_id = inter.user.id
+        try:
+            server = self.bot.get_guild(BOT_CONFIG['SERVER'])
+            member = server.get_member(member_id)
+            return server, member
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
+            raise
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
@@ -248,14 +256,7 @@ class MemberRoleManager(commands.Cog):
     @commands.slash_command(name='twelcome', description="Resends the welcome message", dm_permission=True)
     async def welcome(self, inter: Inter):
         await inter.response.defer(ephemeral=True, with_message=True)
-        logger.info(f"/twelcome from {inter.user.display_name} [{inter.user.id}]")
-
-        try:
-            server, member = await self.get_server_and_member(inter.user.id)
-        except Exception as e:
-            logger.error(e, exc_info=True)
-            await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
-            return
+        server, member = await self.get_server_and_member(inter, 'twelcome')
 
         await inter.followup.send(BOT_MESSAGES['CHECK_DMS'])
         await self.on_member_join(member)
@@ -278,14 +279,7 @@ class MemberRoleManager(commands.Cog):
             return
 
         await inter.response.defer(ephemeral=True, with_message=True)
-        logger.info(f"/tjoin from {inter.user.display_name} [{inter.user.id}]")
-
-        try:
-            server, member = await self.get_server_and_member(inter.user.id)
-        except Exception as e:
-            logger.error(e, exc_info=True)
-            await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
-            return
+        server, member = await self.get_server_and_member(inter, 'tjoin')
 
         response = await self._handle_user_update(server, member, gw2_account=user_name)
         await inter.followup.send(response)
@@ -300,14 +294,7 @@ class MemberRoleManager(commands.Cog):
             return
 
         await inter.response.defer(ephemeral=True, with_message=True)
-        logger.info(f"/tregister from {inter.user.display_name} [{inter.user.id}]")
-
-        try:
-            server, member = await self.get_server_and_member(inter.user.id)
-        except Exception as e:
-            logger.error(e, exc_info=True)
-            await inter.followup.send(BOT_MESSAGES['NOT_DISCORD_MEMBER'])
-            return
+        server, member = await self.get_server_and_member(inter, 'tregister')
 
         response = await self._handle_user_update(server, member, api_key=api_key)
         await inter.followup.send(response)
@@ -344,8 +331,12 @@ class MemberRoleManager(commands.Cog):
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
         discord_members = server.members
-        guild_members = await get_guild_members()
         db_members = get_all_db_users()
+        try:
+            guild_members = await get_guild_members()
+        except GW2ApiException:
+            await send_log(server, 'Auto Update Roles failed: GW2 API did not return member list - rescheduled')
+            return
 
         for db_member in db_members:
             if db_member.get('gw2_account_id') is None or db_member.get('discord_id') is None:

@@ -25,7 +25,8 @@ class Membership(commands.Cog):
         channels = [self.bot.get_channel(x) for x in channel_ids]
         channel_map = {}
         for channel in channels:
-            channel_map[channel] = 'PENDING'
+            if channel:
+                channel_map[channel] = 'PENDING'
         orig_mess = await ctx.send(embed=self.build_embed(channel_map))
 
         author_map = {}
@@ -65,9 +66,9 @@ class Membership(commands.Cog):
         for channel, status in channel_map.items():
             emoji = ''
             if status == 'IN_PROGRESS':
-                    emoji = '⏳'
+                emoji = '⏳'
             if status == 'DONE':
-                    emoji = '✅'
+                emoji = '✅'
             message += f"{emoji}{channel.mention}\n"
         embed.add_field(name='Channels', value=message)
         return embed

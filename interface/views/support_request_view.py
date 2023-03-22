@@ -8,8 +8,8 @@ from disnake.ext.commands import Bot
 from disnake.ui import View, Select, Modal, TextInput, button
 
 from config import LOG_NAME, BOT_CONFIG, BOT_MESSAGES
-from utils.support import create_support_ticket
 from utils.embed_builder import add_content_to_embed
+from utils.support import create_support_ticket
 
 logger = logging.getLogger(LOG_NAME)
 

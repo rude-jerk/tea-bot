@@ -11,6 +11,10 @@ from configs.fractals import fractals
 logger = logging.getLogger(LOG_NAME)
 
 
+class GW2ApiException(Exception):
+    pass
+
+
 def _build_headers(key):
     return {'Authorization': f'Bearer {key}'}
 
@@ -19,6 +23,8 @@ async def get_guild_members():
     async with aiohttp.ClientSession() as session:
         async with session.get(API_ENDPOINTS['GW2_GUILD_MEMBERS'].format(guild_id=GUILD['GW2_GUILD_ID']),
                                headers=_build_headers(BOT_CONFIG['LEADER_KEY'])) as r:
+            if r.status >= 400:
+                raise GW2ApiException()
             json_response = await r.json()
     logger.debug(f"Retrieved {len(json_response)} guild members from the GW2 API")
     return json_response
@@ -42,7 +48,7 @@ async def get_account_details(api_key: str):
                 return False, BOT_MESSAGES['API_WENT_WRONG']
 
 
-class AchievementTypes(Enum):
+class AchievementTypes(str, Enum):
     Fractals = 'fractals'
     PvE = "pve"
     PvP = "pvp"
