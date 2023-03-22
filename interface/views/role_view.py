@@ -76,14 +76,14 @@ class EventReactRoleView(ReactRoleView):
 class TimeZoneReactRoleView(ReactRoleView):
     roles = ['NA', 'EU', 'SEA']
 
-    @button(label='NA', style=ButtonStyle.primary, custom_id='btn_tea_US')
+    @button(label='North America', style=ButtonStyle.primary, custom_id='btn_tea_US')
     async def get_us_role(self, _: Button, inter: MessageInteraction):
         await self.handle_click(inter, 'NA')
 
-    @button(label='EU', style=ButtonStyle.primary, custom_id='btn_tea_EU')
+    @button(label='Europe', style=ButtonStyle.primary, custom_id='btn_tea_EU')
     async def get_eu_role(self, _: Button, inter: MessageInteraction):
         await self.handle_click(inter, 'EU')
 
-    @button(label='SEA', style=ButtonStyle.primary, custom_id='btn_tea_SEA')
+    @button(label='South East Asia', style=ButtonStyle.primary, custom_id='btn_tea_SEA')
     async def get_sea_role(self, _: Button, inter: MessageInteraction):
         await self.handle_click(inter, 'SEA')
