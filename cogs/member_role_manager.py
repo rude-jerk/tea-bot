@@ -403,7 +403,7 @@ class MemberRoleManager(commands.Cog):
             await inter.followup.send(f"{user.mention} is linked to {db_user.gw2_account_id}")
 
     @commands.slash_command(name='autoroles', default_member_permissions=Permissions(manage_roles=True))
-    async def toggle_auto_roles(self):
+    async def toggle_auto_roles(self, _: Inter):
         self.auto_roles = not self.auto_roles
         if self.auto_roles:
             self.auto_update_roles.start()
