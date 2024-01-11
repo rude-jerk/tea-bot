@@ -60,7 +60,7 @@ class Query(commands.Cog):
         await inter.followup.send(embed=raid_embed)
 
     @commands.slash_command(name='exchange', description='Returns the amount of gems/coins received from an exchange')
-    async def exchange(self, inter: Inter, currency: ExchangeCurrency, amount: commands.Range[1, 20000]):
+    async def exchange(self, inter: Inter, currency: ExchangeCurrency, amount: commands.Range[int, 1, 20000]):
         logger.info(f"/exchange {currency} {amount} from {inter.user.display_name}")
         await inter.response.defer(ephemeral=True, with_message=True)
         currency = ExchangeCurrency(currency)

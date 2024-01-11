@@ -140,6 +140,7 @@ class MemberRoleManager(commands.Cog):
 
     @commands.slash_command(name='tenabled', default_member_permissions=Permissions(moderate_members=True),
                             description='Toggles the ability to join discord as a visitor, tjoin, and tregister.')
+    @commands.has_permissions(moderate_members=True)
     async def toggle_joining(self, inter: Inter):
         server = self.bot.get_guild(BOT_CONFIG['SERVER'])
 
@@ -302,6 +303,7 @@ class MemberRoleManager(commands.Cog):
 
     @commands.slash_command(name='tlink', description='Links a given user to a GW2 account',
                             default_member_permissions=Permissions(moderate_members=True), dm_permission=False)
+    @commands.has_permissions(moderate_members=True)
     async def admin_link(self, inter: Inter, member: Member, gw2_account: str):
         await inter.response.defer(ephemeral=True, with_message=True)
         logger.info(f"/tlink for {member.display_name} [{member.id}] from "
@@ -314,6 +316,7 @@ class MemberRoleManager(commands.Cog):
 
     @commands.slash_command(name='tunlink', description='Removes given member\'s link to their GW2 account',
                             default_member_permissions=Permissions(moderate_members=True), dm_permission=False)
+    @commands.has_permissions(moderate_members=True)
     async def admin_unlink(self, inter: Inter, member: Member):
         await inter.response.defer(ephemeral=True, with_message=True)
         logger.info(f"/tunlink for {member.display_name} [{member.id}] from "
@@ -388,6 +391,7 @@ class MemberRoleManager(commands.Cog):
         logger.info("[AUTO ROLES] Guild role polling completed")
 
     @commands.user_command(name='gw2account', default_member_permissions=Permissions(moderate_members=True))
+    @commands.has_permissions(moderate_members=True)
     async def inspect_discord_member(self, inter: Inter, user: User):
         await inter.response.defer(ephemeral=True, with_message=True)
         logger.info(f"gw2account user command for {user.display_name} [{user.id}] from "
@@ -403,6 +407,7 @@ class MemberRoleManager(commands.Cog):
             await inter.followup.send(f"{user.mention} is linked to {db_user.gw2_account_id}")
 
     @commands.slash_command(name='autoroles', default_member_permissions=Permissions(manage_roles=True))
+    @commands.has_permissions(manage_roles=True)
     async def toggle_auto_roles(self, inter: Inter):
         self.auto_roles = not self.auto_roles
         if self.auto_roles:

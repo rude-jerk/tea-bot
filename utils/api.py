@@ -62,7 +62,11 @@ async def get_dailies():
     async with aiohttp.ClientSession() as session:
         async with session.get(API_ENDPOINTS['GW2_DAILIES']) as response:
             dailies_payload = await response.json()
+            dailies_status = response.status
         achievement_dict = {}
+
+        if dailies_status > 300:
+            return None
 
         for daily_cat, dailies_raw in dailies_payload.items():
             if len(dailies_raw) == 0:
